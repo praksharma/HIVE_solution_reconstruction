@@ -1,0 +1,13 @@
+Name = 'Examples/HIVE_Coil'
+Mesh = 'AMAZE'
+Materials = {'Block': 'Copper_NL', 'Pipe': 'Copper_NL', 'Tile': 'Tungsten_NL'}
+Pipe = {'Type': 'smooth tube', 'Diameter': 0.01, 'Length': 0.05}
+Coolant = {'Temperature': 30, 'Pressure': 1, 'Velocity': 10}
+CoilType = 'HIVE'
+CoilDisplacement = [0, 0, 0.0015]
+Frequency = 10000.0
+AsterFile = 'Monoblock_Steady'
+Model = '3D'
+Solver = 'MUMPS'
+Current = 1000
+NbClusters = 100
