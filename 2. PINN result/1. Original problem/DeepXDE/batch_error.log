@@ -1,0 +1,435 @@
+wandb: Starting wandb agent 🕵️
+wandb: Starting wandb agent 🕵️
+wandb: Starting wandb agent 🕵️
+wandb: Starting wandb agent 🕵️
+2024-02-22 23:54:27,411 - wandb.wandb_agent - INFO - Running runs: []
+2024-02-22 23:54:28,510 - wandb.wandb_agent - INFO - Running runs: []
+2024-02-22 23:54:28,522 - wandb.wandb_agent - INFO - Running runs: []
+2024-02-22 23:54:28,617 - wandb.wandb_agent - INFO - Running runs: []
+2024-02-22 23:54:32,055 - wandb.wandb_agent - INFO - Agent received command: run
+2024-02-22 23:54:32,055 - wandb.wandb_agent - INFO - Agent starting run with config:
+	activation: tanh
+	epochs: 50000
+	lr: 0.01
+2024-02-22 23:54:32,059 - wandb.wandb_agent - INFO - About to run command: /usr/bin/env python main.py --activation=tanh --epochs=50000 --lr=0.01
+Using backend: pytorch
+
+2024-02-22 23:54:32,301 - wandb.wandb_agent - INFO - Agent received command: run
+2024-02-22 23:54:32,301 - wandb.wandb_agent - INFO - Agent starting run with config:
+	activation: ReLU
+	epochs: 50000
+	lr: 0.001
+2024-02-22 23:54:32,304 - wandb.wandb_agent - INFO - About to run command: /usr/bin/env python main.py --activation=ReLU --epochs=50000 --lr=0.001
+Using backend: pytorch
+
+2024-02-22 23:54:32,592 - wandb.wandb_agent - INFO - Agent received command: run
+2024-02-22 23:54:32,592 - wandb.wandb_agent - INFO - Agent starting run with config:
+	activation: ReLU
+	epochs: 50000
+	lr: 0.0001
+2024-02-22 23:54:32,596 - wandb.wandb_agent - INFO - About to run command: /usr/bin/env python main.py --activation=ReLU --epochs=50000 --lr=0.0001
+Using backend: pytorch
+
+2024-02-22 23:54:33,338 - wandb.wandb_agent - INFO - Agent received command: run
+2024-02-22 23:54:33,338 - wandb.wandb_agent - INFO - Agent starting run with config:
+	activation: ReLU
+	epochs: 50000
+	lr: 0.01
+2024-02-22 23:54:33,342 - wandb.wandb_agent - INFO - About to run command: /usr/bin/env python main.py --activation=ReLU --epochs=50000 --lr=0.01
+Using backend: pytorch
+
+2024-02-22 23:54:37,072 - wandb.wandb_agent - INFO - Running runs: ['s31gav2d']
+2024-02-22 23:54:37,318 - wandb.wandb_agent - INFO - Running runs: ['vjkhidfg']
+2024-02-22 23:54:37,610 - wandb.wandb_agent - INFO - Running runs: ['0q5mr74e']
+2024-02-22 23:54:38,355 - wandb.wandb_agent - INFO - Running runs: ['3z1vyabs']
+/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/torch/__init__.py:614: UserWarning: torch.set_default_tensor_type() is deprecated as of PyTorch 2.1, please use torch.set_default_dtype() and torch.set_default_device() as alternatives. (Triggered internally at ../torch/csrc/tensor/python_tensor.cpp:451.)
+  _C._set_default_tensor_type(t)
+wandb: Currently logged in as: prakhars962. Use `wandb login --relogin` to force relogin
+/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/torch/__init__.py:614: UserWarning: torch.set_default_tensor_type() is deprecated as of PyTorch 2.1, please use torch.set_default_dtype() and torch.set_default_device() as alternatives. (Triggered internally at ../torch/csrc/tensor/python_tensor.cpp:451.)
+  _C._set_default_tensor_type(t)
+wandb: Currently logged in as: prakhars962. Use `wandb login --relogin` to force relogin
+/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/torch/__init__.py:614: UserWarning: torch.set_default_tensor_type() is deprecated as of PyTorch 2.1, please use torch.set_default_dtype() and torch.set_default_device() as alternatives. (Triggered internally at ../torch/csrc/tensor/python_tensor.cpp:451.)
+  _C._set_default_tensor_type(t)
+wandb: Currently logged in as: prakhars962. Use `wandb login --relogin` to force relogin
+/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/torch/__init__.py:614: UserWarning: torch.set_default_tensor_type() is deprecated as of PyTorch 2.1, please use torch.set_default_dtype() and torch.set_default_device() as alternatives. (Triggered internally at ../torch/csrc/tensor/python_tensor.cpp:451.)
+  _C._set_default_tensor_type(t)
+wandb: Currently logged in as: prakhars962. Use `wandb login --relogin` to force relogin
+wandb: wandb version 0.16.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.15.9
+wandb: Run data is saved locally in /scratch/s.1915438/outputs/HIVE/wandb/run-20240222_235440-vjkhidfg
+wandb: Run `wandb offline` to turn off syncing.
+wandb: wandb version 0.16.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.15.9
+wandb: Run data is saved locally in /scratch/s.1915438/outputs/HIVE/wandb/run-20240222_235440-s31gav2d
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run comic-sweep-4
+wandb: ⭐️ View project at https://wandb.ai/prakhars962/HIVE_first_trial
+wandb: 🧹 View sweep at https://wandb.ai/prakhars962/HIVE_first_trial/sweeps/cqo23nt8
+wandb: 🚀 View run at https://wandb.ai/prakhars962/HIVE_first_trial/runs/vjkhidfg
+wandb: Syncing run sleek-sweep-3
+wandb: ⭐️ View project at https://wandb.ai/prakhars962/HIVE_first_trial
+wandb: 🧹 View sweep at https://wandb.ai/prakhars962/HIVE_first_trial/sweeps/cqo23nt8
+wandb: 🚀 View run at https://wandb.ai/prakhars962/HIVE_first_trial/runs/s31gav2d
+wandb: wandb version 0.16.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.15.9
+wandb: Run data is saved locally in /scratch/s.1915438/outputs/HIVE/wandb/run-20240222_235440-3z1vyabs
+wandb: Run `wandb offline` to turn off syncing.
+wandb: wandb version 0.16.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.15.9
+wandb: Run data is saved locally in /scratch/s.1915438/outputs/HIVE/wandb/run-20240222_235440-0q5mr74e
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run bright-sweep-6
+wandb: ⭐️ View project at https://wandb.ai/prakhars962/HIVE_first_trial
+wandb: 🧹 View sweep at https://wandb.ai/prakhars962/HIVE_first_trial/sweeps/cqo23nt8
+wandb: 🚀 View run at https://wandb.ai/prakhars962/HIVE_first_trial/runs/3z1vyabs
+wandb: Syncing run ancient-sweep-5
+wandb: ⭐️ View project at https://wandb.ai/prakhars962/HIVE_first_trial
+wandb: 🧹 View sweep at https://wandb.ai/prakhars962/HIVE_first_trial/sweeps/cqo23nt8
+wandb: 🚀 View run at https://wandb.ai/prakhars962/HIVE_first_trial/runs/0q5mr74e
+wandb: Waiting for W&B process to finish... (failed 1). Press Control-C to abort syncing.
+wandb: Waiting for W&B process to finish... (failed 1). Press Control-C to abort syncing.
+wandb: Waiting for W&B process to finish... (failed 1). Press Control-C to abort syncing.
+wandb: - 0.007 MB of 0.007 MB uploaded (0.000 MB deduped)wandb: - 0.007 MB of 0.007 MB uploaded (0.000 MB deduped)wandb: - 0.007 MB of 0.007 MB uploaded (0.000 MB deduped)wandb: \ 0.007 MB of 0.007 MB uploaded (0.000 MB deduped)wandb: \ 0.007 MB of 0.007 MB uploaded (0.000 MB deduped)wandb: \ 0.007 MB of 0.007 MB uploaded (0.000 MB deduped)wandb: 🚀 View run bright-sweep-6 at: https://wandb.ai/prakhars962/HIVE_first_trial/runs/3z1vyabs
+wandb: Synced 4 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20240222_235440-3z1vyabs/logs
+wandb: 🚀 View run ancient-sweep-5 at: https://wandb.ai/prakhars962/HIVE_first_trial/runs/0q5mr74e
+wandb: Synced 4 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20240222_235440-0q5mr74e/logs
+wandb: 🚀 View run comic-sweep-4 at: https://wandb.ai/prakhars962/HIVE_first_trial/runs/vjkhidfg
+wandb: Synced 4 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20240222_235440-vjkhidfg/logs
+Traceback (most recent call last):
+  File "main.py", line 127, in <module>
+    train()
+  File "main.py", line 67, in train
+    net = dde.nn.FNN(
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/pytorch/fnn.py", line 21, in __init__
+    self.activation = activations.get(activation)
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/activations.py", line 51, in get
+    return {
+KeyError: 'ReLU'
+Traceback (most recent call last):
+  File "main.py", line 127, in <module>
+    train()
+  File "main.py", line 67, in train
+    net = dde.nn.FNN(
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/pytorch/fnn.py", line 21, in __init__
+    self.activation = activations.get(activation)
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/activations.py", line 51, in get
+    return {
+KeyError: 'ReLU'
+Traceback (most recent call last):
+  File "main.py", line 127, in <module>
+    train()
+  File "main.py", line 67, in train
+    net = dde.nn.FNN(
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/pytorch/fnn.py", line 21, in __init__
+    self.activation = activations.get(activation)
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/activations.py", line 51, in get
+    return {
+KeyError: 'ReLU'
+2024-02-22 23:54:52,762 - wandb.wandb_agent - INFO - Cleaning up finished run: vjkhidfg
+2024-02-22 23:54:53,034 - wandb.wandb_agent - INFO - Cleaning up finished run: 0q5mr74e
+2024-02-22 23:54:53,739 - wandb.wandb_agent - INFO - Cleaning up finished run: 3z1vyabs
+2024-02-22 23:54:54,028 - wandb.wandb_agent - INFO - Agent received command: run
+2024-02-22 23:54:54,028 - wandb.wandb_agent - INFO - Agent starting run with config:
+	activation: GELU
+	epochs: 50000
+	lr: 0.001
+2024-02-22 23:54:54,031 - wandb.wandb_agent - INFO - About to run command: /usr/bin/env python main.py --activation=GELU --epochs=50000 --lr=0.001
+2024-02-22 23:54:54,072 - wandb.wandb_agent - INFO - Agent received command: run
+2024-02-22 23:54:54,072 - wandb.wandb_agent - INFO - Agent starting run with config:
+	activation: GELU
+	epochs: 50000
+	lr: 0.0001
+2024-02-22 23:54:54,075 - wandb.wandb_agent - INFO - About to run command: /usr/bin/env python main.py --activation=GELU --epochs=50000 --lr=0.0001
+Using backend: pytorch
+
+Using backend: pytorch
+
+2024-02-22 23:54:55,040 - wandb.wandb_agent - INFO - Agent received command: run
+2024-02-22 23:54:55,041 - wandb.wandb_agent - INFO - Agent starting run with config:
+	activation: GELU
+	epochs: 50000
+	lr: 0.01
+2024-02-22 23:54:55,043 - wandb.wandb_agent - INFO - About to run command: /usr/bin/env python main.py --activation=GELU --epochs=50000 --lr=0.01
+Using backend: pytorch
+
+2024-02-22 23:54:59,041 - wandb.wandb_agent - INFO - Running runs: ['ihlsd8xc']
+2024-02-22 23:54:59,087 - wandb.wandb_agent - INFO - Running runs: ['9uc6smdf']
+/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/torch/__init__.py:614: UserWarning: torch.set_default_tensor_type() is deprecated as of PyTorch 2.1, please use torch.set_default_dtype() and torch.set_default_device() as alternatives. (Triggered internally at ../torch/csrc/tensor/python_tensor.cpp:451.)
+  _C._set_default_tensor_type(t)
+wandb: Currently logged in as: prakhars962. Use `wandb login --relogin` to force relogin
+/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/torch/__init__.py:614: UserWarning: torch.set_default_tensor_type() is deprecated as of PyTorch 2.1, please use torch.set_default_dtype() and torch.set_default_device() as alternatives. (Triggered internally at ../torch/csrc/tensor/python_tensor.cpp:451.)
+  _C._set_default_tensor_type(t)
+wandb: Currently logged in as: prakhars962. Use `wandb login --relogin` to force relogin
+2024-02-22 23:55:00,055 - wandb.wandb_agent - INFO - Running runs: ['gi4wp3dv']
+wandb: wandb version 0.16.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.15.9
+wandb: Run data is saved locally in /scratch/s.1915438/outputs/HIVE/wandb/run-20240222_235459-ihlsd8xc
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run sandy-sweep-7
+wandb: ⭐️ View project at https://wandb.ai/prakhars962/HIVE_first_trial
+wandb: 🧹 View sweep at https://wandb.ai/prakhars962/HIVE_first_trial/sweeps/cqo23nt8
+wandb: 🚀 View run at https://wandb.ai/prakhars962/HIVE_first_trial/runs/ihlsd8xc
+/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/torch/__init__.py:614: UserWarning: torch.set_default_tensor_type() is deprecated as of PyTorch 2.1, please use torch.set_default_dtype() and torch.set_default_device() as alternatives. (Triggered internally at ../torch/csrc/tensor/python_tensor.cpp:451.)
+  _C._set_default_tensor_type(t)
+wandb: Currently logged in as: prakhars962. Use `wandb login --relogin` to force relogin
+wandb: wandb version 0.16.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.15.9
+wandb: Run data is saved locally in /scratch/s.1915438/outputs/HIVE/wandb/run-20240222_235459-9uc6smdf
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run gallant-sweep-8
+wandb: ⭐️ View project at https://wandb.ai/prakhars962/HIVE_first_trial
+wandb: 🧹 View sweep at https://wandb.ai/prakhars962/HIVE_first_trial/sweeps/cqo23nt8
+wandb: 🚀 View run at https://wandb.ai/prakhars962/HIVE_first_trial/runs/9uc6smdf
+wandb: wandb version 0.16.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.15.9
+wandb: Run data is saved locally in /scratch/s.1915438/outputs/HIVE/wandb/run-20240222_235500-gi4wp3dv
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run frosty-sweep-9
+wandb: ⭐️ View project at https://wandb.ai/prakhars962/HIVE_first_trial
+wandb: 🧹 View sweep at https://wandb.ai/prakhars962/HIVE_first_trial/sweeps/cqo23nt8
+wandb: 🚀 View run at https://wandb.ai/prakhars962/HIVE_first_trial/runs/gi4wp3dv
+wandb: Waiting for W&B process to finish... (failed 1). Press Control-C to abort syncing.
+wandb: Waiting for W&B process to finish... (failed 1). Press Control-C to abort syncing.
+wandb: Waiting for W&B process to finish... (failed 1). Press Control-C to abort syncing.
+wandb: - 0.007 MB of 0.012 MB uploaded (0.000 MB deduped)wandb: \ 0.007 MB of 0.012 MB uploaded (0.000 MB deduped)wandb: 🚀 View run frosty-sweep-9 at: https://wandb.ai/prakhars962/HIVE_first_trial/runs/gi4wp3dv
+wandb: Synced 4 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20240222_235500-gi4wp3dv/logs
+wandb: 🚀 View run sandy-sweep-7 at: https://wandb.ai/prakhars962/HIVE_first_trial/runs/ihlsd8xc
+wandb: Synced 4 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20240222_235459-ihlsd8xc/logs
+wandb: 🚀 View run gallant-sweep-8 at: https://wandb.ai/prakhars962/HIVE_first_trial/runs/9uc6smdf
+wandb: Synced 4 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20240222_235459-9uc6smdf/logs
+Traceback (most recent call last):
+  File "main.py", line 127, in <module>
+    train()
+  File "main.py", line 67, in train
+    net = dde.nn.FNN(
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/pytorch/fnn.py", line 21, in __init__
+    self.activation = activations.get(activation)
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/activations.py", line 51, in get
+    return {
+KeyError: 'GELU'
+Traceback (most recent call last):
+  File "main.py", line 127, in <module>
+    train()
+  File "main.py", line 67, in train
+    net = dde.nn.FNN(
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/pytorch/fnn.py", line 21, in __init__
+    self.activation = activations.get(activation)
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/activations.py", line 51, in get
+    return {
+KeyError: 'GELU'
+Traceback (most recent call last):
+  File "main.py", line 127, in <module>
+    train()
+  File "main.py", line 67, in train
+    net = dde.nn.FNN(
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/pytorch/fnn.py", line 21, in __init__
+    self.activation = activations.get(activation)
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/activations.py", line 51, in get
+    return {
+KeyError: 'GELU'
+2024-02-22 23:55:10,318 - wandb.wandb_agent - INFO - Cleaning up finished run: gi4wp3dv
+2024-02-22 23:55:10,591 - wandb.wandb_agent - INFO - Agent received command: run
+2024-02-22 23:55:10,591 - wandb.wandb_agent - INFO - Agent starting run with config:
+	activation: Swish
+	epochs: 50000
+	lr: 0.001
+2024-02-22 23:55:10,594 - wandb.wandb_agent - INFO - About to run command: /usr/bin/env python main.py --activation=Swish --epochs=50000 --lr=0.001
+Using backend: pytorch
+
+2024-02-22 23:55:14,465 - wandb.wandb_agent - INFO - Cleaning up finished run: ihlsd8xc
+2024-02-22 23:55:14,492 - wandb.wandb_agent - INFO - Cleaning up finished run: 9uc6smdf
+2024-02-22 23:55:14,803 - wandb.wandb_agent - INFO - Agent received command: run
+2024-02-22 23:55:14,803 - wandb.wandb_agent - INFO - Agent starting run with config:
+	activation: Swish
+	epochs: 50000
+	lr: 0.0001
+2024-02-22 23:55:14,806 - wandb.wandb_agent - INFO - About to run command: /usr/bin/env python main.py --activation=Swish --epochs=50000 --lr=0.0001
+Using backend: pytorch
+
+2024-02-22 23:55:14,875 - wandb.wandb_agent - INFO - Agent received command: run
+2024-02-22 23:55:14,876 - wandb.wandb_agent - INFO - Agent starting run with config:
+	activation: Swish
+	epochs: 50000
+	lr: 0.01
+2024-02-22 23:55:14,878 - wandb.wandb_agent - INFO - About to run command: /usr/bin/env python main.py --activation=Swish --epochs=50000 --lr=0.01
+Using backend: pytorch
+
+/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/torch/__init__.py:614: UserWarning: torch.set_default_tensor_type() is deprecated as of PyTorch 2.1, please use torch.set_default_dtype() and torch.set_default_device() as alternatives. (Triggered internally at ../torch/csrc/tensor/python_tensor.cpp:451.)
+  _C._set_default_tensor_type(t)
+wandb: Currently logged in as: prakhars962. Use `wandb login --relogin` to force relogin
+2024-02-22 23:55:15,608 - wandb.wandb_agent - INFO - Running runs: ['0vy3em10']
+wandb: wandb version 0.16.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.15.9
+wandb: Run data is saved locally in /scratch/s.1915438/outputs/HIVE/wandb/run-20240222_235515-0vy3em10
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run faithful-sweep-10
+wandb: ⭐️ View project at https://wandb.ai/prakhars962/HIVE_first_trial
+wandb: 🧹 View sweep at https://wandb.ai/prakhars962/HIVE_first_trial/sweeps/cqo23nt8
+wandb: 🚀 View run at https://wandb.ai/prakhars962/HIVE_first_trial/runs/0vy3em10
+wandb: Waiting for W&B process to finish... (failed 1). Press Control-C to abort syncing.
+wandb: 🚀 View run faithful-sweep-10 at: https://wandb.ai/prakhars962/HIVE_first_trial/runs/0vy3em10
+wandb: Synced 4 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20240222_235515-0vy3em10/logs
+2024-02-22 23:55:19,819 - wandb.wandb_agent - INFO - Running runs: ['2z2tz778']
+2024-02-22 23:55:19,891 - wandb.wandb_agent - INFO - Running runs: ['e2lcpz2j']
+/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/torch/__init__.py:614: UserWarning: torch.set_default_tensor_type() is deprecated as of PyTorch 2.1, please use torch.set_default_dtype() and torch.set_default_device() as alternatives. (Triggered internally at ../torch/csrc/tensor/python_tensor.cpp:451.)
+  _C._set_default_tensor_type(t)
+wandb: Currently logged in as: prakhars962. Use `wandb login --relogin` to force relogin
+/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/torch/__init__.py:614: UserWarning: torch.set_default_tensor_type() is deprecated as of PyTorch 2.1, please use torch.set_default_dtype() and torch.set_default_device() as alternatives. (Triggered internally at ../torch/csrc/tensor/python_tensor.cpp:451.)
+  _C._set_default_tensor_type(t)
+wandb: Currently logged in as: prakhars962. Use `wandb login --relogin` to force relogin
+wandb: wandb version 0.16.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.15.9
+wandb: Run data is saved locally in /scratch/s.1915438/outputs/HIVE/wandb/run-20240222_235520-2z2tz778
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run volcanic-sweep-11
+wandb: ⭐️ View project at https://wandb.ai/prakhars962/HIVE_first_trial
+wandb: 🧹 View sweep at https://wandb.ai/prakhars962/HIVE_first_trial/sweeps/cqo23nt8
+wandb: 🚀 View run at https://wandb.ai/prakhars962/HIVE_first_trial/runs/2z2tz778
+wandb: wandb version 0.16.3 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Tracking run with wandb version 0.15.9
+wandb: Run data is saved locally in /scratch/s.1915438/outputs/HIVE/wandb/run-20240222_235520-e2lcpz2j
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run deft-sweep-12
+wandb: ⭐️ View project at https://wandb.ai/prakhars962/HIVE_first_trial
+wandb: 🧹 View sweep at https://wandb.ai/prakhars962/HIVE_first_trial/sweeps/cqo23nt8
+wandb: 🚀 View run at https://wandb.ai/prakhars962/HIVE_first_trial/runs/e2lcpz2j
+Traceback (most recent call last):
+  File "main.py", line 127, in <module>
+    train()
+  File "main.py", line 67, in train
+    net = dde.nn.FNN(
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/pytorch/fnn.py", line 21, in __init__
+    self.activation = activations.get(activation)
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/activations.py", line 51, in get
+    return {
+KeyError: 'Swish'
+wandb: Waiting for W&B process to finish... (failed 1). Press Control-C to abort syncing.
+wandb: Waiting for W&B process to finish... (failed 1). Press Control-C to abort syncing.
+wandb: 🚀 View run volcanic-sweep-11 at: https://wandb.ai/prakhars962/HIVE_first_trial/runs/2z2tz778
+wandb: Synced 4 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20240222_235520-2z2tz778/logs
+2024-02-22 23:55:25,883 - wandb.wandb_agent - INFO - Cleaning up finished run: 0vy3em10
+wandb: 🚀 View run deft-sweep-12 at: https://wandb.ai/prakhars962/HIVE_first_trial/runs/e2lcpz2j
+wandb: Synced 4 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20240222_235520-e2lcpz2j/logs
+2024-02-22 23:55:26,807 - wandb.wandb_agent - INFO - Agent received command: exit
+2024-02-22 23:55:26,807 - wandb.wandb_agent - INFO - Received exit command. Killing runs and quitting.
+wandb: Terminating and syncing runs. Press ctrl-c to kill.
+Traceback (most recent call last):
+  File "main.py", line 127, in <module>
+    train()
+  File "main.py", line 67, in train
+    net = dde.nn.FNN(
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/pytorch/fnn.py", line 21, in __init__
+    self.activation = activations.get(activation)
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/activations.py", line 51, in get
+    return {
+KeyError: 'Swish'
+Traceback (most recent call last):
+  File "main.py", line 127, in <module>
+    train()
+  File "main.py", line 67, in train
+    net = dde.nn.FNN(
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/pytorch/fnn.py", line 21, in __init__
+    self.activation = activations.get(activation)
+  File "/scratch/s.1915438/env/modulus/lib/python3.8/site-packages/deepxde/nn/activations.py", line 51, in get
+    return {
+KeyError: 'Swish'
+2024-02-22 23:55:30,097 - wandb.wandb_agent - INFO - Cleaning up finished run: 2z2tz778
+2024-02-22 23:55:30,158 - wandb.wandb_agent - INFO - Cleaning up finished run: e2lcpz2j
+2024-02-22 23:55:30,312 - wandb.wandb_agent - INFO - Agent received command: exit
+2024-02-22 23:55:30,312 - wandb.wandb_agent - INFO - Received exit command. Killing runs and quitting.
+wandb: Terminating and syncing runs. Press ctrl-c to kill.
+2024-02-22 23:55:30,359 - wandb.wandb_agent - INFO - Agent received command: exit
+2024-02-22 23:55:30,359 - wandb.wandb_agent - INFO - Received exit command. Killing runs and quitting.
+wandb: Terminating and syncing runs. Press ctrl-c to kill.
+slurmstepd: error: unlink(/tmp/slurmd/job7777117/slurm_script): No such file or directory
+slurmstepd: error: unlink(/tmp/slurmd/job7777118/slurm_script): No such file or directory
+wandb: Waiting for W&B process to finish... (success).
+wandb: - 0.007 MB of 0.007 MB uploaded (0.000 MB deduped)wandb: \ 0.007 MB of 0.007 MB uploaded (0.000 MB deduped)wandb: 
+wandb: Run history:
+wandb:      PDE loss ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█
+wandb:     Pipe loss ▁███████████████████████████████████████
+wandb: Top tile loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:    Total loss █▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:         epoch ▁▁▁▂▂▂▂▂▂▃▃▃▃▃▃▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇▇███
+wandb: 
+wandb: Run summary:
+wandb:      PDE loss 0.0
+wandb:     Pipe loss 58.02147
+wandb: Top tile loss 63.78658
+wandb:    Total loss 121.80805
+wandb:         epoch 50000
+wandb: 
+wandb: 🚀 View run true-sweep-1 at: https://wandb.ai/prakhars962/HIVE_first_trial/runs/z0f8foh8
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20240222_235215-z0f8foh8/logs
+2024-02-23 00:08:52,163 - wandb.wandb_agent - INFO - Cleaning up finished run: z0f8foh8
+2024-02-23 00:08:52,866 - wandb.wandb_agent - INFO - Agent received command: exit
+2024-02-23 00:08:52,866 - wandb.wandb_agent - INFO - Received exit command. Killing runs and quitting.
+wandb: Terminating and syncing runs. Press ctrl-c to kill.
+wandb: Waiting for W&B process to finish... (success).
+wandb: - 0.007 MB of 0.007 MB uploaded (0.000 MB deduped)wandb: \ 0.007 MB of 0.007 MB uploaded (0.000 MB deduped)wandb: 
+wandb: Run history:
+wandb:      PDE loss ▁▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:     Pipe loss ▅▅▅▅▅▅▅▅▅▅▅▅▅█▅▅▁▅▅▅▅▅▅▄▅▅▇▃▅▅▅▅▅▅▃▄▄▅▅▄
+wandb: Top tile loss ▄▄▄▄▄▄▄▄▄▄▄▄▄▁▄▄█▄▄▄▄▄▄▅▄▄▂▆▄▄▄▄▄▄▆▅▅▄▄▅
+wandb:    Total loss ▁▁▁▁▁▁▁▁▁▁▁▁▁▇▁▁█▁▁▁▁▁▁▁▁▁▅▂▁▁▁▁▁▁▂▁▁▁▁▁
+wandb:         epoch ▁▁▁▂▂▂▂▂▂▃▃▃▃▃▃▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇▇███
+wandb: 
+wandb: Run summary:
+wandb:      PDE loss 0.0
+wandb:     Pipe loss 57.99877
+wandb: Top tile loss 63.80992
+wandb:    Total loss 121.80869
+wandb:         epoch 50000
+wandb: 
+wandb: 🚀 View run sleek-sweep-3 at: https://wandb.ai/prakhars962/HIVE_first_trial/runs/s31gav2d
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20240222_235440-s31gav2d/logs
+2024-02-23 00:10:12,730 - wandb.wandb_agent - INFO - Cleaning up finished run: s31gav2d
+2024-02-23 00:10:13,603 - wandb.wandb_agent - INFO - Agent received command: exit
+2024-02-23 00:10:13,604 - wandb.wandb_agent - INFO - Received exit command. Killing runs and quitting.
+wandb: Terminating and syncing runs. Press ctrl-c to kill.
+slurmstepd: error: unlink(/tmp/slurmd/job7777116/slurm_script): No such file or directory
+wandb: Waiting for W&B process to finish... (success).
+wandb: - 0.007 MB of 0.007 MB uploaded (0.000 MB deduped)wandb: \ 0.007 MB of 0.007 MB uploaded (0.000 MB deduped)wandb: 
+wandb: Run history:
+wandb:      PDE loss ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▃▁▁▁▁▁▁▁▁▁▁▁▁█▁▁▁▁▁▁
+wandb:     Pipe loss █▅▂▁▁▁▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: Top tile loss █▆▄▃▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:    Total loss █▅▄▂▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▁▁▁▁▁▁
+wandb:         epoch ▁▁▁▂▂▂▂▂▂▃▃▃▃▃▃▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇▇███
+wandb: 
+wandb: Run summary:
+wandb:      PDE loss 1.13445
+wandb:     Pipe loss 31.82501
+wandb: Top tile loss 40.22116
+wandb:    Total loss 73.18062
+wandb:         epoch 50000
+wandb: 
+wandb: 🚀 View run wise-sweep-2 at: https://wandb.ai/prakhars962/HIVE_first_trial/runs/8wtxg79b
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20240222_235407-8wtxg79b/logs
+2024-02-23 00:10:24,164 - wandb.wandb_agent - INFO - Cleaning up finished run: 8wtxg79b
+2024-02-23 00:10:24,643 - wandb.wandb_agent - INFO - Agent received command: exit
+2024-02-23 00:10:24,643 - wandb.wandb_agent - INFO - Received exit command. Killing runs and quitting.
+wandb: Terminating and syncing runs. Press ctrl-c to kill.
+slurmstepd: error: unlink(/tmp/slurmd/job7777115/slurm_script): No such file or directory

@@ -1,0 +1,10 @@
+program: main.py
+method: grid
+parameters:
+  activation:
+    values: ["tanh", "relu","gelu", "swish", "sin", "sigmoid"]
+  epochs:
+    values: [50000]
+  lr:
+    values:[0.001, 0.0001, 0.01]
+

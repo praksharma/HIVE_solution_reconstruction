@@ -1,0 +1,35 @@
+2024-02-22 23:55:00,364 INFO    MainThread:63402 [wandb_setup.py:_flush():76] Current SDK version is 0.15.9
+2024-02-22 23:55:00,365 INFO    MainThread:63402 [wandb_setup.py:_flush():76] Configure stats pid to 63402
+2024-02-22 23:55:00,365 INFO    MainThread:63402 [wandb_setup.py:_flush():76] Loading settings from /home/s.1915438/.config/wandb/settings
+2024-02-22 23:55:00,365 INFO    MainThread:63402 [wandb_setup.py:_flush():76] Loading settings from /scratch/s.1915438/outputs/HIVE/wandb/settings
+2024-02-22 23:55:00,365 INFO    MainThread:63402 [wandb_setup.py:_flush():76] Loading settings from environment variables: {'entity': 'prakhars962', 'project': 'HIVE_first_trial', 'sweep_id': 'cqo23nt8', 'root_dir': '/scratch/s.1915438/outputs/HIVE', 'run_id': 'gi4wp3dv', 'sweep_param_path': '/scratch/s.1915438/outputs/HIVE/wandb/sweep-cqo23nt8/config-gi4wp3dv.yaml'}
+2024-02-22 23:55:00,365 INFO    MainThread:63402 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2024-02-22 23:55:00,365 INFO    MainThread:63402 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'main.py', 'program': 'main.py'}
+2024-02-22 23:55:00,366 INFO    MainThread:63402 [wandb_init.py:_log_setup():524] Logging user logs to /scratch/s.1915438/outputs/HIVE/wandb/run-20240222_235500-gi4wp3dv/logs/debug.log
+2024-02-22 23:55:00,366 INFO    MainThread:63402 [wandb_init.py:_log_setup():525] Logging internal logs to /scratch/s.1915438/outputs/HIVE/wandb/run-20240222_235500-gi4wp3dv/logs/debug-internal.log
+2024-02-22 23:55:00,366 INFO    MainThread:63402 [wandb_init.py:init():564] calling init triggers
+2024-02-22 23:55:00,366 INFO    MainThread:63402 [wandb_init.py:init():571] wandb.init called with sweep_config: {'activation': 'GELU', 'epochs': 50000, 'lr': 0.01}
+config: {}
+2024-02-22 23:55:00,366 INFO    MainThread:63402 [wandb_init.py:init():613] starting backend
+2024-02-22 23:55:00,366 INFO    MainThread:63402 [wandb_init.py:init():617] setting up manager
+2024-02-22 23:55:00,370 INFO    MainThread:63402 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2024-02-22 23:55:00,372 INFO    MainThread:63402 [wandb_init.py:init():623] backend started and connected
+2024-02-22 23:55:00,382 INFO    MainThread:63402 [wandb_run.py:_config_callback():1282] config_cb None None {'activation': 'GELU', 'epochs': 50000, 'lr': 0.01}
+2024-02-22 23:55:00,383 INFO    MainThread:63402 [wandb_init.py:init():714] updated telemetry
+2024-02-22 23:55:00,383 INFO    MainThread:63402 [wandb_init.py:init():747] communicating run to backend with 60.0 second timeout
+2024-02-22 23:55:00,710 INFO    MainThread:63402 [wandb_run.py:_on_init():2180] communicating current version
+2024-02-22 23:55:00,768 INFO    MainThread:63402 [wandb_run.py:_on_init():2189] got version response upgrade_message: "wandb version 0.16.3 is available!  To upgrade, please run:\n $ pip install wandb --upgrade"
+
+2024-02-22 23:55:00,769 INFO    MainThread:63402 [wandb_init.py:init():798] starting run threads in backend
+2024-02-22 23:55:01,443 INFO    MainThread:63402 [wandb_run.py:_console_start():2159] atexit reg
+2024-02-22 23:55:01,444 INFO    MainThread:63402 [wandb_run.py:_redirect():2014] redirect: wrap_raw
+2024-02-22 23:55:01,444 INFO    MainThread:63402 [wandb_run.py:_redirect():2079] Wrapping output streams.
+2024-02-22 23:55:01,444 INFO    MainThread:63402 [wandb_run.py:_redirect():2104] Redirects installed.
+2024-02-22 23:55:01,444 INFO    MainThread:63402 [wandb_init.py:init():839] run started, returning control to user process
+2024-02-22 23:55:03,070 INFO    MainThread:63402 [wandb_run.py:_finish():1894] finishing run prakhars962/HIVE_first_trial/gi4wp3dv
+2024-02-22 23:55:03,070 INFO    MainThread:63402 [wandb_run.py:_atexit_cleanup():2128] got exitcode: 1
+2024-02-22 23:55:03,070 INFO    MainThread:63402 [wandb_run.py:_restore():2111] restore
+2024-02-22 23:55:03,070 INFO    MainThread:63402 [wandb_run.py:_restore():2117] restore done
+2024-02-22 23:55:05,951 INFO    MainThread:63402 [wandb_run.py:_footer_history_summary_info():3481] rendering history
+2024-02-22 23:55:05,952 INFO    MainThread:63402 [wandb_run.py:_footer_history_summary_info():3513] rendering summary
+2024-02-22 23:55:05,956 INFO    MainThread:63402 [wandb_run.py:_footer_sync_info():3440] logging synced files

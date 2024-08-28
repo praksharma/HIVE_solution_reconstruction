@@ -1,0 +1,8 @@
+wandb_version: 1
+
+activation:
+  value: ReLU
+epochs:
+  value: 50000
+lr:
+  value: 0.001

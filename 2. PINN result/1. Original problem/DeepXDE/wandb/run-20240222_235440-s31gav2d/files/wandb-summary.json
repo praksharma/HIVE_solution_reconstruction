@@ -1,0 +1,1 @@
+{"epoch": 50000, "PDE loss": 0.0, "Pipe loss": 57.9987678527832, "Top tile loss": 63.80992126464844, "Total loss": 121.80868911743164, "_timestamp": 1708647007.3450387, "_runtime": 926.3952586650848, "_step": 49999, "_wandb": {"runtime": 926}}

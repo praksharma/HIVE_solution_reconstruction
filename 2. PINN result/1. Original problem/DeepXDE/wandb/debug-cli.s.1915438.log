@@ -1,0 +1,114 @@
+2024-02-22 23:50:37 INFO Running runs: []
+2024-02-22 23:50:37 INFO Agent received command: run
+2024-02-22 23:50:37 INFO Agent starting run with config:
+	activation: tanh
+	epochs: 50000
+	lr: 0.001
+2024-02-22 23:50:37 INFO About to run command: /usr/bin/env python main.py --activation=tanh --epochs=50000 --lr=0.001
+2024-02-22 23:50:42 INFO Running runs: ['z0f8foh8']
+2024-02-22 23:53:58 INFO Running runs: []
+2024-02-22 23:54:02 INFO Agent received command: run
+2024-02-22 23:54:02 INFO Agent starting run with config:
+	activation: tanh
+	epochs: 50000
+	lr: 0.0001
+2024-02-22 23:54:02 INFO About to run command: /usr/bin/env python main.py --activation=tanh --epochs=50000 --lr=0.0001
+2024-02-22 23:54:07 INFO Running runs: ['8wtxg79b']
+2024-02-22 23:54:27 INFO Running runs: []
+2024-02-22 23:54:28 INFO Running runs: []
+2024-02-22 23:54:28 INFO Running runs: []
+2024-02-22 23:54:28 INFO Running runs: []
+2024-02-22 23:54:32 INFO Agent received command: run
+2024-02-22 23:54:32 INFO Agent starting run with config:
+	activation: tanh
+	epochs: 50000
+	lr: 0.01
+2024-02-22 23:54:32 INFO About to run command: /usr/bin/env python main.py --activation=tanh --epochs=50000 --lr=0.01
+2024-02-22 23:54:32 INFO Agent received command: run
+2024-02-22 23:54:32 INFO Agent starting run with config:
+	activation: ReLU
+	epochs: 50000
+	lr: 0.001
+2024-02-22 23:54:32 INFO About to run command: /usr/bin/env python main.py --activation=ReLU --epochs=50000 --lr=0.001
+2024-02-22 23:54:32 INFO Agent received command: run
+2024-02-22 23:54:32 INFO Agent starting run with config:
+	activation: ReLU
+	epochs: 50000
+	lr: 0.0001
+2024-02-22 23:54:32 INFO About to run command: /usr/bin/env python main.py --activation=ReLU --epochs=50000 --lr=0.0001
+2024-02-22 23:54:33 INFO Agent received command: run
+2024-02-22 23:54:33 INFO Agent starting run with config:
+	activation: ReLU
+	epochs: 50000
+	lr: 0.01
+2024-02-22 23:54:33 INFO About to run command: /usr/bin/env python main.py --activation=ReLU --epochs=50000 --lr=0.01
+2024-02-22 23:54:37 INFO Running runs: ['s31gav2d']
+2024-02-22 23:54:37 INFO Running runs: ['vjkhidfg']
+2024-02-22 23:54:37 INFO Running runs: ['0q5mr74e']
+2024-02-22 23:54:38 INFO Running runs: ['3z1vyabs']
+2024-02-22 23:54:52 INFO Cleaning up finished run: vjkhidfg
+2024-02-22 23:54:53 INFO Cleaning up finished run: 0q5mr74e
+2024-02-22 23:54:53 INFO Cleaning up finished run: 3z1vyabs
+2024-02-22 23:54:54 INFO Agent received command: run
+2024-02-22 23:54:54 INFO Agent starting run with config:
+	activation: GELU
+	epochs: 50000
+	lr: 0.001
+2024-02-22 23:54:54 INFO About to run command: /usr/bin/env python main.py --activation=GELU --epochs=50000 --lr=0.001
+2024-02-22 23:54:54 INFO Agent received command: run
+2024-02-22 23:54:54 INFO Agent starting run with config:
+	activation: GELU
+	epochs: 50000
+	lr: 0.0001
+2024-02-22 23:54:54 INFO About to run command: /usr/bin/env python main.py --activation=GELU --epochs=50000 --lr=0.0001
+2024-02-22 23:54:55 INFO Agent received command: run
+2024-02-22 23:54:55 INFO Agent starting run with config:
+	activation: GELU
+	epochs: 50000
+	lr: 0.01
+2024-02-22 23:54:55 INFO About to run command: /usr/bin/env python main.py --activation=GELU --epochs=50000 --lr=0.01
+2024-02-22 23:54:59 INFO Running runs: ['ihlsd8xc']
+2024-02-22 23:54:59 INFO Running runs: ['9uc6smdf']
+2024-02-22 23:55:00 INFO Running runs: ['gi4wp3dv']
+2024-02-22 23:55:10 INFO Cleaning up finished run: gi4wp3dv
+2024-02-22 23:55:10 INFO Agent received command: run
+2024-02-22 23:55:10 INFO Agent starting run with config:
+	activation: Swish
+	epochs: 50000
+	lr: 0.001
+2024-02-22 23:55:10 INFO About to run command: /usr/bin/env python main.py --activation=Swish --epochs=50000 --lr=0.001
+2024-02-22 23:55:14 INFO Cleaning up finished run: ihlsd8xc
+2024-02-22 23:55:14 INFO Cleaning up finished run: 9uc6smdf
+2024-02-22 23:55:14 INFO Agent received command: run
+2024-02-22 23:55:14 INFO Agent starting run with config:
+	activation: Swish
+	epochs: 50000
+	lr: 0.0001
+2024-02-22 23:55:14 INFO About to run command: /usr/bin/env python main.py --activation=Swish --epochs=50000 --lr=0.0001
+2024-02-22 23:55:14 INFO Agent received command: run
+2024-02-22 23:55:14 INFO Agent starting run with config:
+	activation: Swish
+	epochs: 50000
+	lr: 0.01
+2024-02-22 23:55:14 INFO About to run command: /usr/bin/env python main.py --activation=Swish --epochs=50000 --lr=0.01
+2024-02-22 23:55:15 INFO Running runs: ['0vy3em10']
+2024-02-22 23:55:19 INFO Running runs: ['2z2tz778']
+2024-02-22 23:55:19 INFO Running runs: ['e2lcpz2j']
+2024-02-22 23:55:25 INFO Cleaning up finished run: 0vy3em10
+2024-02-22 23:55:26 INFO Agent received command: exit
+2024-02-22 23:55:26 INFO Received exit command. Killing runs and quitting.
+2024-02-22 23:55:30 INFO Cleaning up finished run: 2z2tz778
+2024-02-22 23:55:30 INFO Cleaning up finished run: e2lcpz2j
+2024-02-22 23:55:30 INFO Agent received command: exit
+2024-02-22 23:55:30 INFO Received exit command. Killing runs and quitting.
+2024-02-22 23:55:30 INFO Agent received command: exit
+2024-02-22 23:55:30 INFO Received exit command. Killing runs and quitting.
+2024-02-23 00:08:52 INFO Cleaning up finished run: z0f8foh8
+2024-02-23 00:08:52 INFO Agent received command: exit
+2024-02-23 00:08:52 INFO Received exit command. Killing runs and quitting.
+2024-02-23 00:10:12 INFO Cleaning up finished run: s31gav2d
+2024-02-23 00:10:13 INFO Agent received command: exit
+2024-02-23 00:10:13 INFO Received exit command. Killing runs and quitting.
+2024-02-23 00:10:24 INFO Cleaning up finished run: 8wtxg79b
+2024-02-23 00:10:24 INFO Agent received command: exit
+2024-02-23 00:10:24 INFO Received exit command. Killing runs and quitting.

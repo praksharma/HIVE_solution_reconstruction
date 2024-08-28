@@ -1,0 +1,8 @@
+wandb_version: 1
+
+activation:
+  value: Swish
+epochs:
+  value: 50000
+lr:
+  value: 0.01
