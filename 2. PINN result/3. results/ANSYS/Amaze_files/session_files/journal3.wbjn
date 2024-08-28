@@ -1,0 +1,97 @@
+# encoding: utf-8
+# 2024 R1
+SetScriptVersion(Version="24.1.144")
+system1 = GetSystem(Name="SYS 1")
+solution1 = system1.GetContainer(ComponentName="Solution")
+solution1.Edit()
+model1 = system1.GetContainer(ComponentName="Model")
+model1.Exit()
+template1 = GetTemplate(TemplateName="External Data")
+system2 = template1.CreateSystem(
+    Position="Left",
+    RelativeTo=system1)
+setup1 = system2.GetContainer(ComponentName="Setup")
+externalLoadFileData1 = setup1.AddDataFile(FilePath="C:/Users/Prakh/Desktop/HIVE/ANSYS/Loads/Load_CSV/EM_load.csv")
+externalLoadFileDataProperty1 = externalLoadFileData1.GetDataProperty()
+externalLoadColumnData1 = externalLoadFileDataProperty1.GetColumnData(Name="ExternalLoadColumnData")
+externalLoadFileDataProperty1.SetColumnDataType(
+    ColumnData=externalLoadColumnData1,
+    DataType="X Coordinate")
+externalLoadFileDataProperty1.SetColumnDataType(
+    ColumnData=externalLoadColumnData1,
+    DataType="Heat Generation")
+externalLoadColumnData2 = externalLoadFileDataProperty1.GetColumnData(Name="ExternalLoadColumnData 1")
+externalLoadFileDataProperty1.SetColumnDataType(
+    ColumnData=externalLoadColumnData2,
+    DataType="X Coordinate")
+externalLoadColumnData3 = externalLoadFileDataProperty1.GetColumnData(Name="ExternalLoadColumnData 2")
+externalLoadFileDataProperty1.SetColumnDataType(
+    ColumnData=externalLoadColumnData3,
+    DataType="Y Coordinate")
+externalLoadColumnData4 = externalLoadFileDataProperty1.GetColumnData(Name="ExternalLoadColumnData 3")
+externalLoadFileDataProperty1.SetColumnDataType(
+    ColumnData=externalLoadColumnData4,
+    DataType="Z Coordinate")
+setupComponent1 = system2.GetComponent(Name="Setup")
+setupComponent2 = system1.GetComponent(Name="Setup")
+setupComponent1.TransferData(TargetComponent=setupComponent2)
+setup2 = system1.GetContainer(ComponentName="Setup")
+setup2.Edit()
+model1.Exit()
+setup2.Edit()
+setup2.Edit()
+setup2.Edit()
+setupComponent1.UpdateUpstreamComponents()
+externalLoadFileData1.SetAsMaster(Master=True)
+externalLoadFileData1.Description = "Source"
+setupComponent2.UpdateUpstreamComponents()
+model1.Exit()
+modelComponent1 = system1.GetComponent(Name="Model")
+modelComponent1.Refresh()
+setupComponent2.Refresh()
+setup2.Edit()
+externalLoadFileData1.ModifyFileData(FilePath=r"C:\Users\Prakh\Desktop\HIVE\ANSYS\Loads\Load_CSV\EM_load.csv")
+externalLoadFileDataProperty1.SetColumnDataType(
+    ColumnData=externalLoadColumnData1,
+    DataType="X Coordinate")
+externalLoadFileDataProperty1.SetColumnDataType(
+    ColumnData=externalLoadColumnData2,
+    DataType="Y Coordinate")
+externalLoadFileDataProperty1.SetColumnDataType(
+    ColumnData=externalLoadColumnData3,
+    DataType="Z Coordinate")
+externalLoadFileDataProperty1.SetColumnDataType(
+    ColumnData=externalLoadColumnData4,
+    DataType="Heat Generation")
+Save(Overwrite=True)
+setupComponent1.Update(AllDependencies=True)
+setupComponent1.UpdateUpstreamComponents()
+setupComponent2.Update(AllDependencies=True)
+system3 = template1.CreateSystem(
+    Position="Below",
+    RelativeTo=system2)
+system2.DisplayText = "Source"
+system3.DisplayText = "HTC"
+setup3 = system3.GetContainer(ComponentName="Setup")
+externalLoadFileData2 = setup3.AddDataFile(FilePath="C:/Users/Prakh/Desktop/HIVE/ANSYS/Loads/HeatTransfer.csv")
+externalLoadFileDataProperty2 = externalLoadFileData2.GetDataProperty()
+externalLoadColumnData5 = externalLoadFileDataProperty2.GetColumnData(Name="ExternalLoadColumnData")
+externalLoadFileDataProperty2.SetColumnDataType(
+    ColumnData=externalLoadColumnData5,
+    DataType="Temperature")
+externalLoadColumnData6 = externalLoadFileDataProperty2.GetColumnData(Name="ExternalLoadColumnData 1")
+externalLoadFileDataProperty2.SetColumnDataType(
+    ColumnData=externalLoadColumnData6,
+    DataType="Heat Flux")
+externalLoadFileData2.SetAsMaster(Master=True)
+Save(Overwrite=True)
+setupComponent3 = system3.GetComponent(Name="Setup")
+setupComponent3.TransferData(TargetComponent=setupComponent2)
+setupComponent3.Update(AllDependencies=True)
+setupComponent2.UpdateUpstreamComponents()
+Save(Overwrite=True)
+model1.Exit()
+modelComponent1.Refresh()
+setupComponent2.Refresh()
+setup2.Edit()
+Save(Overwrite=True)

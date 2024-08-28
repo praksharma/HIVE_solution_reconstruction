@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<Xdmf Version="3.0">
+  <Domain>
+    <Grid Name="mesh" GridType="Uniform">
+      <Topology NumberOfElements="131622" TopologyType="Tetrahedron" NodesPerElement="4">
+        <DataItem Dimensions="131622 4" NumberType="UInt" Format="HDF">temperature_gradient.h5:/Mesh/mesh/topology</DataItem>
+      </Topology>
+      <Geometry GeometryType="XYZ">
+        <DataItem Dimensions="29133 3" Format="HDF">temperature_gradient.h5:/Mesh/mesh/geometry</DataItem>
+      </Geometry>
+      <Attribute Name="f_248" AttributeType="Vector" Center="Node">
+        <DataItem Dimensions="29133 3" Format="HDF">temperature_gradient.h5:/VisualisationVector/0</DataItem>
+      </Attribute>
+    </Grid>
+  </Domain>
+</Xdmf>

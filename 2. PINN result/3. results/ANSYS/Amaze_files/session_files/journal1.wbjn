@@ -1,0 +1,18 @@
+# encoding: utf-8
+# 2024 R1
+SetScriptVersion(Version="24.1.144")
+template1 = GetTemplate(
+    TemplateName="Steady-State Thermal",
+    Solver="ANSYS")
+system1 = template1.CreateSystem()
+geometry1 = system1.GetContainer(ComponentName="Geometry")
+geometry1.SetFile(FilePath="C:/Users/Prakh/Desktop/HIVE/rhydian geometry/amaze sample exports/Sample.stl")
+modelComponent1 = system1.GetComponent(Name="Model")
+modelComponent1.Refresh()
+model1 = system1.GetContainer(ComponentName="Model")
+model1.Edit()
+model1.Exit()
+geometry1.SetFile(FilePath="C:/Users/Prakh/Desktop/HIVE/Solidworks/HIVE.STEP")
+modelComponent1.Refresh()
+model1.Edit()
+Save(Overwrite=True)

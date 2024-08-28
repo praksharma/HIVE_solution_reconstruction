@@ -1,0 +1,1 @@
+singularity shell --bind $(pwd):/mnt salome_meca-lgpl-2022.1.0-1-20221225-scibian-9.sif 

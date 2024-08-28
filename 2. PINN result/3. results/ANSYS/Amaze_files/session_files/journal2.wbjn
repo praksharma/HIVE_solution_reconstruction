@@ -1,0 +1,44 @@
+# encoding: utf-8
+# 2024 R1
+SetScriptVersion(Version="24.1.144")
+system1 = GetSystem(Name="SYS")
+geometry1 = system1.GetContainer(ComponentName="Geometry")
+geometry1.SetFile(FilePath="C:/Users/Prakh/Desktop/HIVE/rhydian geometry/amaze sample exports/Sample.step")
+modelComponent1 = system1.GetComponent(Name="Model")
+modelComponent1.Refresh()
+model1 = system1.GetContainer(ComponentName="Model")
+model1.Edit()
+engineeringData1 = system1.GetContainer(ComponentName="Engineering Data")
+material1 = engineeringData1.GetMaterial(Name="Structural Steel")
+matlProp1 = material1.GetProperty(Name="Thermal Conductivity")
+matlProp1.SetData(
+    Variables=["Thermal Conductivity"],
+    Values=[["1 [W m^-1 C^-1]"]])
+modelComponent1.Update(AllDependencies=True)
+Save(Overwrite=True)
+model1.Exit()
+model1.Edit()
+template1 = GetTemplate(TemplateName="Mesh")
+system2 = template1.CreateSystem(
+    Position="Left",
+    RelativeTo=system1)
+system2.Delete()
+model1.Exit()
+model1.Edit()
+model1.Exit()
+model1.Edit()
+matlProp1.SetData(
+    Variables=["Thermal Conductivity"],
+    Values=[["418.8 [W m^-1 C^-1]"]])
+modelComponent1.Update(AllDependencies=True)
+Save(Overwrite=True)
+model1.Exit()
+system1.DisplayText = "Dirichlet BC"
+system1.Copy(KeepConnections=True)
+system3 = GetSystem(Name="SYS 1")
+system3.DisplayText = "NeumannBC"
+model2 = system3.GetContainer(ComponentName="Model")
+model2.Edit()
+Save(Overwrite=True)
+model2.Exit()
+Save(Overwrite=True)

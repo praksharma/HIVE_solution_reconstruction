@@ -1,0 +1,17 @@
+P actions make_etude
+P memjob 2097152
+P memory_limit 2048.0
+P mode batch
+P mpi_nbcpu 1
+P mpi_nbnoeud 1
+P ncpus 1
+P rep_trav /tmp/s_1915438-scs2043-batch_18125
+P time_limit 99999.0
+P tpsjob 1667
+P version stable
+A memjeveux 256.0
+A tpmax 99999.0
+F mmed /tmp/VL_23.02.28_15.53.04.296503/Sim/Examples/Test_Coil/Mesh.med D  20
+F comm /home/ibsim/VirtualLab/Scripts/Experiments/HIVE/Sim/Monoblock_Steady.comm D  1
+F mess /home/ibsim/VirtualLab/Output/HIVE/Tutorials/Examples/Test_Coil/Aster/AsterLog R  6
+R repe /home/ibsim/VirtualLab/Output/HIVE/Tutorials/Examples/Test_Coil/Aster R  0

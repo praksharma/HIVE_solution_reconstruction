@@ -1,0 +1,51 @@
+ERMES analysis started...
+
+Reading nodes...
+Nodes read.
+
+Setting normals and DOFs...
+Done.
+
+Building linear system...
+Importing J sources from ExpJSource-1.dat...
+Building finished in 4 seconds.
+
+Solving linear system...
+
+Iterative solver: Bi-Conjugate Gradient
+Preconditioner  : Diagonal
+
+it = 250   res = 0.000568313
+
+--------> CONVERGENCE ACHIEVED <-------- 
+
+||b||             = 145.961
+||Ax-b||          = 1.2409e-07
+||Ax-b||/||b||    = 8.50158e-10
+Solver estimation = 6.29448e-10
+
+Max. iterations: 1000000
+Tolerance      : 1e-09
+Problem size   : 237509
+
+Iterations     : 480
+Time spent     : 38 seconds
+
+Writing results vector in file...
+Done.
+
+Solver finished.
+
+Printing result mesh...
+Result mesh printed.
+
+Printing double Joule_heating...
+Printing vector rJ...
+Printing vector iJ...
+Printing double mod(J)...
+Printing vector iE...
+Printing vector rE...
+Printing double mod(E)...
+
+ERMES analysis finished.
+

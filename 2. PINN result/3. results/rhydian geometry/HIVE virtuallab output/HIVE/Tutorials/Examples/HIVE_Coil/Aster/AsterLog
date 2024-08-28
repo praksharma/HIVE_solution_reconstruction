@@ -1,0 +1,1263 @@
+# ------------------------------------------------------------------------------------------
+# Impression du contenu du fichier de commandes à exécuter :
+# ------------------------------------------------------------------------------------------
+import sys
+sys.dont_write_bytecode=True
+import os
+import numpy as np
+
+import AsterFunc
+
+SimDict = AsterFunc.GetSimDict()
+Parameters = SimDict['Parameters']
+
+'''
+Steady state analysis of monoblock component .
+'''
+
+DEBUT(PAR_LOT = 'NON',LANG='EN')
+
+# ==============================================================================
+# Read in the mesh and define model
+mesh = LIRE_MAILLAGE(FORMAT='MED',
+                     NOM_MED="Sample",
+                     UNITE=20)
+
+Thermod = AFFE_MODELE(AFFE=_F(MODELISATION=(Parameters.Model),
+                          PHENOMENE='THERMIQUE',
+                          TOUT='OUI'),
+                           MAILLAGE=mesh)
+
+# ==============================================================================
+# Define functions for NL material properties and assign materials to parts
+DictMat = AsterFunc.MaterialProps(SimDict['MATERIAL_DIR'],Parameters.Materials.values())
+
+BlockRCP = DEFI_FONCTION(NOM_PARA='TEMP',
+                         PROL_DROITE='CONSTANT',
+                         PROL_GAUCHE='CONSTANT',
+                         VALE=DictMat[Parameters.Materials['Block']]["RhoCp"])
+BlockLAM = DEFI_FONCTION(NOM_PARA='TEMP',
+                            PROL_DROITE='CONSTANT',
+                            PROL_GAUCHE='CONSTANT',
+                            VALE=DictMat[Parameters.Materials['Block']]["Lambda"])
+BlockMat = DEFI_MATERIAU(THER_NL=_F(LAMBDA=BlockLAM,
+                                    RHO_CP=BlockRCP))
+
+PipeRCP = DEFI_FONCTION(NOM_PARA='TEMP',
+                           PROL_DROITE='CONSTANT',
+                        PROL_GAUCHE='CONSTANT',
+                        VALE=DictMat[Parameters.Materials['Pipe']]["RhoCp"])
+PipeLAM = DEFI_FONCTION(NOM_PARA='TEMP',
+                        PROL_DROITE='CONSTANT',
+                        PROL_GAUCHE='CONSTANT',
+                        VALE=DictMat[Parameters.Materials['Pipe']]["Lambda"])
+PipeMat = DEFI_MATERIAU(THER_NL=_F(LAMBDA=PipeLAM,
+                                   RHO_CP=PipeRCP))
+
+TileRCP = DEFI_FONCTION(NOM_PARA='TEMP',
+                        PROL_DROITE='CONSTANT',
+                        PROL_GAUCHE='CONSTANT',
+                        VALE=DictMat[Parameters.Materials['Tile']]["RhoCp"])
+TileLAM = DEFI_FONCTION(NOM_PARA='TEMP',
+                           PROL_DROITE='CONSTANT',
+                           PROL_GAUCHE='CONSTANT',
+                           VALE=DictMat[Parameters.Materials['Tile']]["Lambda"])
+TileMat = DEFI_MATERIAU(THER_NL=_F(LAMBDA=TileLAM,
+                                   RHO_CP=TileRCP))
+
+Thermat = AFFE_MATERIAU(AFFE=(_F(MATER=TileMat, GROUP_MA='Tile'),
+                              _F(MATER=PipeMat, GROUP_MA='Pipe'),
+                              _F(MATER=BlockMat, GROUP_MA='Block')),
+                        MAILLAGE=mesh)
+
+# ==============================================================================
+# Create coundary conditions
+
+# Thermal load (from ERMES)
+ERMES = np.load(SimDict['EMData'])
+Load_EM = []
+for i,JH in enumerate(ERMES):
+    Load_EM.append((_F(GROUP_MA="_{}".format(i),SOUR=JH)))
+EMI = AFFE_CHAR_THER(SOURCE = Load_EM, MODELE=Thermod)
+
+# Cooling due to coolant. HTC data generated during PreAster
+HTdata = np.fromfile(SimDict['HTData'],dtype=float,count=-1,sep=" ")
+# Change flux to negative for energy to leave sample
+HTdata[1::2] = -HTdata[1::2]
+PipeFlux = DEFI_FONCTION(NOM_PARA='TEMP',
+                            PROL_DROITE='LINEAIRE',
+                            PROL_GAUCHE='LINEAIRE',
+                            VALE=HTdata)
+
+PipeHTC = AFFE_CHAR_THER_F(FLUX_NL=_F(FLUN=PipeFlux,GROUP_MA='PipeFace'),
+                             MODELE=Thermod)
+
+# Heat transfer between joins. TCC - Thermal Contact Conductance
+# As TCC goes to infiity behaviour moves towards perfect heat exchange
+# Tile-Block join
+if getattr(Parameters,'TileBlockTCC',None) != None:
+    # Imperfect heat exchange.
+    Con_TB = AFFE_CHAR_THER(MODELE=Thermod,
+                            ECHANGE_PAROI=_F(GROUP_MA_1='ContactTB',
+                                             GROUP_MA_2='ContactTB_double',
+                                             COEF_H=Parameters.TileBlockTCC))
+else:
+    #Perfect heat exchange
+    Con_TB = AFFE_CHAR_THER(MODELE=Thermod,
+                            LIAISON_MAIL=_F(GROUP_MA_MAIT='Tile',
+                                             GROUP_MA_ESCL='ContactTB'))
+
+#Block-Pipe join
+if getattr(Parameters,'BlockPipeTCC',None) != None:
+    Con_BP = AFFE_CHAR_THER(MODELE=Thermod,
+                            ECHANGE_PAROI=_F(GROUP_MA_1='ContactBP',
+                                             GROUP_MA_2='ContactBP_double',
+                                             COEF_H=Parameters.BlockPipeTCC))
+else:
+    Con_BP = AFFE_CHAR_THER(MODELE=Thermod,
+                            LIAISON_MAIL=_F(GROUP_MA_MAIT='Block',
+                                             GROUP_MA_ESCL='ContactBP'))
+# List of boundary conditions applied
+Loading = [_F(CHARGE=EMI),_F(CHARGE=PipeHTC),_F(CHARGE=Con_TB),_F(CHARGE=Con_BP)]
+
+# Radiation effects
+TileEmissivity = getattr(Parameters,'TileEmissivity',0)
+BlockEmissivity = getattr(Parameters,'BlockEmissivity',0)
+if TileEmissivity!=0 or BlockEmissivity!=0:
+    Radiation = []
+    if TileEmissivity:
+        Radiation.append(_F(GROUP_MA='TileExternal',
+                        SIGMA=5.67e-8,
+                        EPSILON=TileEmissivity,
+                        TEMP_EXT=Parameters.TempExt))
+    if BlockEmissivity:
+        Radiation.append(_F(GROUP_MA='BlockExternal',
+                        SIGMA=5.67e-8,
+                        EPSILON=BlockEmissivity,
+                        TEMP_EXT=Parameters.TempExt))
+
+    Radiat = AFFE_CHAR_THER(MODELE=Thermod,
+                            RAYONNEMENT=Radiation)
+    Loading.append(_F(CHARGE=Radiat))
+
+# ==============================================================================
+# Thermal analysis
+# Provide default values for certain parameters
+# Solver: Which solver to use
+# NewtonUpdate: After how many iterations the tangent matrix is updated. Calculating
+# the tangent is computationally expsnive, therefore this is defaulted to 3.
+# MaxIter: Max. number of iterations of the newton algorithm
+Solver = getattr(Parameters,'Solver', 'MUMPS')
+NewtonUpdate = getattr(Parameters,'NewtonUpdate',3)
+_MaxIter = 50 if NewtonUpdate == 0 else 10*NewtonUpdate
+MaxIter = getattr(Parameters,'MaxIter',_MaxIter)
+
+# Steady state analysis
+# Set initial temperature as the coolant temperature to speed up convergence
+resther = THER_NON_LINE(CHAM_MATER=Thermat,
+                        EXCIT=Loading,
+                        MODELE=Thermod,
+                        SOLVEUR=_F(METHODE=Solver),
+                        ETAT_INIT=_F(STATIONNAIRE='OUI',VALE=Parameters.Coolant['Temperature']),
+                        NEWTON=_F(REAC_ITER=NewtonUpdate),
+                        CONVERGENCE=_F(ITER_GLOB_MAXI=MaxIter))
+
+# ==============================================================================
+# Save results
+DEFI_FICHIER(FICHIER='./REPE_OUT/Thermal.rmed',
+             TYPE='BINARY',
+             UNITE=80)
+
+IMPR_RESU(RESU=_F(RESULTAT=resther,
+                  NOM_CHAM='TEMP',
+                  NOM_CHAM_MED='Temperature'),
+          UNITE=80)
+
+FIN()
+
+# ------------------------------------------------------------------------------------------
+
+  Ouverture en écriture du fichier ./vola.1
+
+ <INFO> Démarrage de l'exécution.
+                                                                                
+                                                                                
+              -- CODE_ASTER -- VERSION:  EXPLOITATION (stable) --               
+                                                                                
+                       Modified 14.4.0 version 21/08/2019                       
+                the revision 2708712c2a40 - branch  v14.4_smeca                 
+                        Copyright EDF R & D 1991 - 2023                         
+                                                                                
+                    Exécution of:  Tue Feb 28 14:51:58 2023                     
+          Name of the machine:  sl1.sunbird.supercomputingwales.ac.uk           
+                               Structure:  64bit                                
+                               CPU type:  x86_64                                
+Operating system:  Linux-3.10.0-1160.76.1.el7.x86_64-x86_64-with-debian-buster-sid
+                     Language of the messages:  en (UTF-8)                      
+                                                                                
+                             Python version: 3.6.5                              
+                             NumPy version: 1.15.1                              
+   
+   !------------------------------------------------------------------------!
+   ! <A> <SUPERVIS2_2>                                                      !
+   !                                                                        !
+   !  You use an old version of Code_Aster.                                 !
+   !                                                                        !
+   !  By upgrading your version, you will profit from the last improvements !
+   !  made to the code since 15 month.                                      !
+   !  If you have private developments, you are likely to have an important !
+   !  work of bearing if you do not follow the upgraded ones.               !
+   !                                                                        !
+   !                                                                        !
+   ! This is a warning. If you do not understand the meaning of this        !
+   !  warning, you can obtain unexpected results!                           !
+   !------------------------------------------------------------------------!
+   
+                             Parallelism MPI: idle                              
+                           OpenMP parallelism: Nombre                           
+                          credit of processes used:  1                          
+                      Version of the HDF5 library : 1.10.3                      
+                       Version of the MED library : 4.0.0                       
+                     Version de la librairie MFront : 3.2.1                     
+                          MUMPS library version: 5.1.2                          
+                          PETSc library: not available                          
+                     Version of the SCOTCH library : 6.0.4                      
+
+                  Mémoire limite pour l'exécution : 2048.00 Mo                  
+                   consommée par l'initialisation : 281.48 Mo                   
+                  par les objets du jeu de commandes : 0.00 Mo                  
+                 reste pour l'allocation dynamique : 1763.15 Mo                 
+                   Cut limiting files of exchange:  48.00 Go                    
+                                                                                
+
+.. __stg1_txt15
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0001 Concept of the type:  -
+  # ------------------------------------------------------------------------------------------
+  DEBUT(PAR_LOT='NON',
+        LANG='EN',
+        IMPR_MACRO='NON',
+        DEBUG=_F(JXVERI='NON',
+                 SDVERI='NON',
+                 JEVEUX='NON',
+                 HIST_ETAPE='NON',),
+        MESURE_TEMPS=_F(NIVE_DETAIL=1,
+                        MOYENNE='NON',),
+        MEMOIRE=_F(TAILLE_BLOC=800.0,
+                   TAILLE_GROUP_ELEM=1000,),
+        RESERVE_CPU=_F(BORNE=900,),
+        INFO=1,)
+
+   
+   !-------------------------------------------------!
+   ! <I> <SUPERVIS_41>                               !
+   !                                                 !
+   ! The version 14.4.0 was modified by 1 revisions. !
+   !-------------------------------------------------!
+   
+   
+   !-----------------------------------------------------------------------------------!
+   ! <A> <SUPERVIS_1>                                                                  !
+   !                                                                                   !
+   !  The use of key word PAR_LOT='NON' allows to reach in reading and writing         !
+   !  the contents of the Aster concepts. So your study is excluded from the qualified !
+   !  perimeter of Code_Aster since all its stages cannot be certified.                !
+   !                                                                                   !
+   !  Advices:                                                                         !
+   !  - There is no particularly risk of false result' except if your                  !
+   !  programming introduces it.                                                       !
+   !  - Distinguish computation itself (which must undoubtedly pass in PAR_LOT='OUI')  !
+   !  postprocessings (which would require mode PAR_LOT='NON') which can               !
+   !  be realized in POURSUITE.                                                        !
+   !                                                                                   !
+   !                                                                                   !
+   ! This is a warning. If you do not understand the meaning of this                   !
+   !  warning, you can obtain unexpected results!                                      !
+   !-----------------------------------------------------------------------------------!
+   
+
+ Initial value of maximum time CPU = 99999 second
+ Valeur of the maximum time CPU placed to the orders = 99099 second
+ Réserve CPU envisaged = 900 seconds 
+
+  Ouverture en écriture du fichier ./glob.1
+
+  Ouverture en écriture du fichier ./vola.1
+
+  Ouverture en lecture du fichier /opt/SalomeMeca/V2019.0.3_universal/tools/Code_aster_stable-v144_smeca/lib/aster/elem.1
+
+     Nom de la base                          :  ELEMBASE
+     Créée avec la version                   :  14.04.00
+     Nombre d'enregistrements utilisés       :  43
+     Nombre d'enregistrements maximum        :  512
+     Longueur d'enregistrement (octets)      :  819200
+     Nombre d'identificateurs utilisés       :  123
+     Taille maximum du répertoire            :  300
+     Pourcentage d'utilisation du répertoire :  41 %
+
+  Ouverture en lecture du fichier /opt/SalomeMeca/V2019.0.3_universal/tools/Code_aster_stable-v144_smeca/lib/aster/elem.1
+
+
+     Nom de la base                          :  ELEMBASE
+     Nombre d'enregistrements utilisés       :  43
+     Nombre d'enregistrements maximum        :  512
+     Longueur d'enregistrement (octets)      :  819200
+     Nombre total d'accès en lecture         :  60
+     Volume des accès en lecture             :         46.88 Mo.
+     Nombre total d'accès en écriture        :  0
+     Volume des accès en écriture            :          0.00 Mo.
+     Nombre d'identificateurs utilisés       :  123
+     Taille maximum du répertoire            :  300
+     Pourcentage d'utilisation du répertoire :  41 %
+
+ Second reading of the catalogues of the elements made. 
+
+ End of reading (lasted 0.135921 S.)   
+  # Memory (Mo):    329.31 /    321.48 /     44.30 /     22.92 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0001 user+syst:          0.18S (syst:          0.17S, Elaps:          0.19S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt21
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0002 Concept of the type:  maillage_sdaster
+  # ------------------------------------------------------------------------------------------
+  mesh = LIRE_MAILLAGE(FORMAT='MED',
+                       UNITE=20,
+                       NOM_MED='Sample',
+                       INFO_MED=1,
+                       VERI_MAIL=_F(VERIF='OUI',
+                                    APLAT=1.E-3,),
+                       INFO=1,)
+
+Vérification du maillage.
+
+------------ MAILLAGE mesh     - IMPRESSIONS NIVEAU  1 ------------
+
+MA-28-FEVR-2023 14:51:59                                                        
+
+NOMBRE DE NOEUDS                       29133
+
+NOMBRE DE MAILLES                     159365
+                              SEG2                 1753
+                              TRIA3               25990
+                              TETRA4             131622
+
+NOMBRE DE GROUPES DE NOEUDS                6
+                              PipeInV2                             1
+                              PipeNd                            2595
+                              PipeOutV2                            1
+                              BlockNd                           4219
+                              PipeInV1                             2
+                              PipeOutV1                            2
+
+NOMBRE DE GROUPES DE MAILLES             125
+                              Sample                          131622
+                              Tile                            113618
+                              Pipe                              5104
+                              Block                            12900
+                              PipeFace                          1458
+                              SampleSurface                    21418
+                              PipeIn                              44
+                              PipeOut                             44
+                              ContactTB                          540
+                              ContactBP                         1746
+                              TileExternal                     18926
+                              BlockExternal                      946
+                              TileFront                         1598
+                              TileBack                          1598
+                              TileSideA                         1578
+                              TileSideB                         1594
+                              CoilFace                          5624
+                              TileTop                           5624
+                              BlockFront                         167
+                              BlockBack                          171
+                              BlockSideA                         134
+                              BlockSideB                         146
+                              BlockBottom                        164
+                              ContactTB_double                   540
+                              ContactBP_double                  1746
+                              _0                               17748
+                              _1                                1278
+                              _2                                1444
+                              _3                                1660
+                              _4                                1757
+                              _5                                1747
+                              _6                                1731
+                              _7                                1694
+                              _8                                1692
+                              _9                                1777
+                              _10                               1745
+                              _11                               1683
+                              _12                               1573
+                              _13                               1387
+                              _14                               1332
+                              _15                               1298
+                              _16                               1361
+                              _17                               1311
+                              _18                               1333
+                              _19                               1279
+                              _20                               1324
+                              _21                               1387
+                              _22                               1356
+                              _23                               1390
+                              _24                               1419
+                              _25                               1504
+                              _26                               1508
+                              _27                               1515
+                              _28                               1490
+                              _29                               1468
+                              _30                               1493
+                              _31                               1468
+                              _32                               1532
+                              _33                               1821
+                              _34                               1889
+                              _35                               1776
+                              _36                               1510
+                              _37                               1422
+                              _38                               1366
+                              _39                               1562
+                              _40                               1634
+                              _41                               1590
+                              _42                               1457
+                              _43                               1315
+                              _44                               1327
+                              _45                               1211
+                              _46                               1273
+                              _47                               1337
+                              _48                               1364
+                              _49                               1479
+                              _50                               1346
+                              _51                               1334
+                              _52                               1232
+                              _53                               1344
+                              _54                               1331
+                              _55                               1255
+                              _56                               1102
+                              _57                               1111
+                              _58                               1121
+                              _59                               1017
+                              _60                               1099
+                              _61                               1236
+                              _62                               1244
+                              _63                               1348
+                              _64                               1398
+                              _65                               1413
+                              _66                               1195
+                              _67                               1101
+                              _68                               1070
+                              _69                               1089
+                              _70                               1075
+                              _71                               1012
+                              _72                               1013
+                              _73                                941
+                              _74                                892
+                              _75                                809
+                              _76                                735
+                              _77                                690
+                              _78                                592
+                              _79                                537
+                              _80                                552
+                              _81                                649
+                              _82                                611
+                              _83                                619
+                              _84                                617
+                              _85                                610
+                              _86                                475
+                              _87                                420
+                              _88                                391
+                              _89                                487
+                              _90                                487
+                              _91                                454
+                              _92                                389
+                              _93                                333
+                              _94                                231
+                              _95                                194
+                              _96                                141
+                              _97                                111
+                              _98                                 88
+                              _99                                 64
+
+--------------------------------------------------------------------------------
+
+  # Memory (Mo):    348.43 /    341.39 /     62.02 /     33.50 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0002 user+syst:          0.44S (syst:          0.04S, Elaps:          0.44S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt26
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0004 Concept of the type:  modele_sdaster
+  # ------------------------------------------------------------------------------------------
+  Thermod = AFFE_MODELE(MAILLAGE=mesh,
+                        AFFE=_F(TOUT='OUI',
+                                PHENOMENE='THERMIQUE',
+                                MODELISATION=('3D', ),),
+                        INFO=1,
+                        DISTRIBUTION=_F(PARTITIONNEUR='METIS',
+                                        METHODE='SOUS_DOMAINE',),
+                        VERI_JACOBIEN='OUI',)
+
+
+Sur les 159365 mailles du maillage mesh, on a demandé l'affectation de 159365, on a pu en affecter 157612
+ Modélisation     Type maille  Élément fini     Nombre
+ 3D               TRIA3        THER_FACE3       25990
+ 3D               TETRA4       THER_TETRA4      131622
+#2      Calculs elementaires et assemblages               CPU (USER+SYST/SYST/ELAPS):      0.08      0.00      0.08
+  # Memory (Mo):    385.38 /    379.12 /     65.20 /     52.73 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0004 user+syst:          0.15S (syst:          0.01S, Elaps:          0.15S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt35
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0005 Concept of the type:  fonction_sdaster
+  # ------------------------------------------------------------------------------------------
+  BlockRCP = DEFI_FONCTION(NOM_PARA='TEMP',
+                           VALE=(0.0, 3.449600E6, 100.0, 3.449600E6),
+                           PROL_DROITE='CONSTANT',
+                           PROL_GAUCHE='CONSTANT',
+                           NOM_RESU='TOUTRESU',
+                           INTERPOL=('LIN', ),
+                           VERIF='CROISSANT',
+                           INFO=1,)
+
+  # Memory (Mo):    385.38 /    379.12 /     65.20 /     52.73 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0005 user+syst:          0.00S (syst:          0.00S, Elaps:          0.00S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt39
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0006 Concept of the type:  fonction_sdaster
+  # ------------------------------------------------------------------------------------------
+  BlockLAM = DEFI_FONCTION(NOM_PARA='TEMP',
+                           VALE=(0.0, 394.0, 100.0, 394.0),
+                           PROL_DROITE='CONSTANT',
+                           PROL_GAUCHE='CONSTANT',
+                           NOM_RESU='TOUTRESU',
+                           INTERPOL=('LIN', ),
+                           VERIF='CROISSANT',
+                           INFO=1,)
+
+  # Memory (Mo):    385.38 /    379.12 /     65.20 /     52.73 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0006 user+syst:          0.00S (syst:          0.00S, Elaps:          0.00S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt41
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0007 Concept of the type:  mater_sdaster
+  # ------------------------------------------------------------------------------------------
+  BlockMat = DEFI_MATERIAU(THER_NL=_F(LAMBDA=BlockLAM,
+                                      RHO_CP=BlockRCP,),
+                           INFO=1,)
+
+Propriétés définies dans le matériau: THER_NL.
+  # Memory (Mo):    385.38 /    379.12 /     65.20 /     52.73 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0007 user+syst:          0.00S (syst:          0.00S, Elaps:          0.01S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt46
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0008 Concept of the type:  fonction_sdaster
+  # ------------------------------------------------------------------------------------------
+  PipeRCP = DEFI_FONCTION(NOM_PARA='TEMP',
+                          VALE=(0.0, 3.449600E6, 100.0, 3.449600E6),
+                          PROL_DROITE='CONSTANT',
+                          PROL_GAUCHE='CONSTANT',
+                          NOM_RESU='TOUTRESU',
+                          INTERPOL=('LIN', ),
+                          VERIF='CROISSANT',
+                          INFO=1,)
+
+  # Memory (Mo):    385.38 /    379.12 /     65.20 /     52.73 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0008 user+syst:          0.00S (syst:          0.00S, Elaps:          0.00S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt50
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0009 Concept of the type:  fonction_sdaster
+  # ------------------------------------------------------------------------------------------
+  PipeLAM = DEFI_FONCTION(NOM_PARA='TEMP',
+                          VALE=(0.0, 394.0, 100.0, 394.0),
+                          PROL_DROITE='CONSTANT',
+                          PROL_GAUCHE='CONSTANT',
+                          NOM_RESU='TOUTRESU',
+                          INTERPOL=('LIN', ),
+                          VERIF='CROISSANT',
+                          INFO=1,)
+
+  # Memory (Mo):    385.38 /    379.12 /     65.20 /     52.73 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0009 user+syst:          0.00S (syst:          0.00S, Elaps:          0.00S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt52
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0010 Concept of the type:  mater_sdaster
+  # ------------------------------------------------------------------------------------------
+  PipeMat = DEFI_MATERIAU(THER_NL=_F(LAMBDA=PipeLAM,
+                                     RHO_CP=PipeRCP,),
+                          INFO=1,)
+
+Propriétés définies dans le matériau: THER_NL.
+  # Memory (Mo):    385.38 /    379.25 /     65.20 /     52.73 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0010 user+syst:          0.00S (syst:          0.00S, Elaps:          0.01S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt57
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0011 Concept of the type:  fonction_sdaster
+  # ------------------------------------------------------------------------------------------
+  TileRCP = DEFI_FONCTION(NOM_PARA='TEMP',
+                          VALE=(0.0, 2.502500E6, 100.0, 2.502500E6),
+                          PROL_DROITE='CONSTANT',
+                          PROL_GAUCHE='CONSTANT',
+                          NOM_RESU='TOUTRESU',
+                          INTERPOL=('LIN', ),
+                          VERIF='CROISSANT',
+                          INFO=1,)
+
+  # Memory (Mo):    385.38 /    379.25 /     65.20 /     52.73 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0011 user+syst:          0.00S (syst:          0.00S, Elaps:          0.00S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt61
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0012 Concept of the type:  fonction_sdaster
+  # ------------------------------------------------------------------------------------------
+  TileLAM = DEFI_FONCTION(NOM_PARA='TEMP',
+                          VALE=(0.0, 163.3, 100.0, 163.3),
+                          PROL_DROITE='CONSTANT',
+                          PROL_GAUCHE='CONSTANT',
+                          NOM_RESU='TOUTRESU',
+                          INTERPOL=('LIN', ),
+                          VERIF='CROISSANT',
+                          INFO=1,)
+
+  # Memory (Mo):    385.38 /    379.25 /     65.20 /     52.73 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0012 user+syst:          0.00S (syst:          0.00S, Elaps:          0.00S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt63
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0013 Concept of the type:  mater_sdaster
+  # ------------------------------------------------------------------------------------------
+  TileMat = DEFI_MATERIAU(THER_NL=_F(LAMBDA=TileLAM,
+                                     RHO_CP=TileRCP,),
+                          INFO=1,)
+
+Propriétés définies dans le matériau: THER_NL.
+  # Memory (Mo):    385.38 /    379.25 /     65.20 /     52.73 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0013 user+syst:          0.01S (syst:          0.00S, Elaps:          0.00S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt68
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0014 Concept of the type:  cham_mater
+  # ------------------------------------------------------------------------------------------
+  Thermat = AFFE_MATERIAU(MAILLAGE=mesh,
+                          AFFE=(_F(GROUP_MA=('Tile', ),
+                                   MATER=(TileMat, ),),
+                                _F(GROUP_MA=('Pipe', ),
+                                   MATER=(PipeMat, ),),
+                                _F(GROUP_MA=('Block', ),
+                                   MATER=(BlockMat, ),),
+                                ),
+                          INFO=1,)
+
+  # Memory (Mo):    385.38 /    380.99 /     65.20 /     52.73 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0014 user+syst:          0.02S (syst:          0.01S, Elaps:          0.02S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt78
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0015 Concept of the type:  char_ther
+  # ------------------------------------------------------------------------------------------
+  EMI = AFFE_CHAR_THER(MODELE=Thermod,
+                       SOURCE=(_F(GROUP_MA=('_0', ),
+                                  SOUR=1.263390623657511E5,),
+                               _F(GROUP_MA=('_1', ),
+                                  SOUR=6.545889570251607E6,),
+                               _F(GROUP_MA=('_2', ),
+                                  SOUR=1.3359097069102043E7,),
+                               _F(GROUP_MA=('_3', ),
+                                  SOUR=1.9964479540005036E7,),
+                               _F(GROUP_MA=('_4', ),
+                                  SOUR=2.663418642868756E7,),
+                               _F(GROUP_MA=('_5', ),
+                                  SOUR=3.3724573950187795E7,),
+                               _F(GROUP_MA=('_6', ),
+                                  SOUR=4.0831156509928405E7,),
+                               _F(GROUP_MA=('_7', ),
+                                  SOUR=4.7968477681263104E7,),
+                               _F(GROUP_MA=('_8', ),
+                                  SOUR=5.543785441285782E7,),
+                               _F(GROUP_MA=('_9', ),
+                                  SOUR=6.3579573885510735E7,),
+                               _F(GROUP_MA=('_10', ),
+                                  SOUR=7.234720953941472E7,),
+                               _F(GROUP_MA=('_11', ),
+                                  SOUR=8.118977466973121E7,),
+                               _F(GROUP_MA=('_12', ),
+                                  SOUR=8.943757268552817E7,),
+                               _F(GROUP_MA=('_13', ),
+                                  SOUR=9.679098445181547E7,),
+                               _F(GROUP_MA=('_14', ),
+                                  SOUR=1.034430539609761E8,),
+                               _F(GROUP_MA=('_15', ),
+                                  SOUR=1.101466851409893E8,),
+                               _F(GROUP_MA=('_16', ),
+                                  SOUR=1.1693717703396656E8,),
+                               _F(GROUP_MA=('_17', ),
+                                  SOUR=1.2344939335004418E8,),
+                               _F(GROUP_MA=('_18', ),
+                                  SOUR=1.2983297750144516E8,),
+                               _F(GROUP_MA=('_19', ),
+                                  SOUR=1.3613289588355035E8,),
+                               _F(GROUP_MA=('_20', ),
+                                  SOUR=1.4253555777201563E8,),
+                               _F(GROUP_MA=('_21', ),
+                                  SOUR=1.489325366754916E8,),
+                               _F(GROUP_MA=('_22', ),
+                                  SOUR=1.5545137083966845E8,),
+                               _F(GROUP_MA=('_23', ),
+                                  SOUR=1.6199551674129227E8,),
+                               _F(GROUP_MA=('_24', ),
+                                  SOUR=1.6858796644415498E8,),
+                               _F(GROUP_MA=('_25', ),
+                                  SOUR=1.7540162151295158E8,),
+                               _F(GROUP_MA=('_26', ),
+                                  SOUR=1.822623990802699E8,),
+                               _F(GROUP_MA=('_27', ),
+                                  SOUR=1.8935603622836077E8,),
+                               _F(GROUP_MA=('_28', ),
+                                  SOUR=1.9654610219526827E8,),
+                               _F(GROUP_MA=('_29', ),
+                                  SOUR=2.0357538504812026E8,),
+                               _F(GROUP_MA=('_30', ),
+                                  SOUR=2.1034670779347938E8,),
+                               _F(GROUP_MA=('_31', ),
+                                  SOUR=2.1706609229591644E8,),
+                               _F(GROUP_MA=('_32', ),
+                                  SOUR=2.2408530451516846E8,),
+                               _F(GROUP_MA=('_33', ),
+                                  SOUR=2.3166861671939617E8,),
+                               _F(GROUP_MA=('_34', ),
+                                  SOUR=2.4031527405872047E8,),
+                               _F(GROUP_MA=('_35', ),
+                                  SOUR=2.4924042409449145E8,),
+                               _F(GROUP_MA=('_36', ),
+                                  SOUR=2.5710599480371714E8,),
+                               _F(GROUP_MA=('_37', ),
+                                  SOUR=2.6387897050156334E8,),
+                               _F(GROUP_MA=('_38', ),
+                                  SOUR=2.7033511220427936E8,),
+                               _F(GROUP_MA=('_39', ),
+                                  SOUR=2.7724061917700285E8,),
+                               _F(GROUP_MA=('_40', ),
+                                  SOUR=2.848626006883144E8,),
+                               _F(GROUP_MA=('_41', ),
+                                  SOUR=2.929241891800033E8,),
+                               _F(GROUP_MA=('_42', ),
+                                  SOUR=3.0057225155163956E8,),
+                               _F(GROUP_MA=('_43', ),
+                                  SOUR=3.0747426724589795E8,),
+                               _F(GROUP_MA=('_44', ),
+                                  SOUR=3.1393303039607865E8,),
+                               _F(GROUP_MA=('_45', ),
+                                  SOUR=3.201489487838816E8,),
+                               _F(GROUP_MA=('_46', ),
+                                  SOUR=3.2643152444019437E8,),
+                               _F(GROUP_MA=('_47', ),
+                                  SOUR=3.330064399117747E8,),
+                               _F(GROUP_MA=('_48', ),
+                                  SOUR=3.398079836049786E8,),
+                               _F(GROUP_MA=('_49', ),
+                                  SOUR=3.471427092845641E8,),
+                               _F(GROUP_MA=('_50', ),
+                                  SOUR=3.546653514960998E8,),
+                               _F(GROUP_MA=('_51', ),
+                                  SOUR=3.6182806938234836E8,),
+                               _F(GROUP_MA=('_52', ),
+                                  SOUR=3.6866779561990076E8,),
+                               _F(GROUP_MA=('_53', ),
+                                  SOUR=3.756194033412146E8,),
+                               _F(GROUP_MA=('_54', ),
+                                  SOUR=3.829897893651684E8,),
+                               _F(GROUP_MA=('_55', ),
+                                  SOUR=3.9036505974675715E8,),
+                               _F(GROUP_MA=('_56', ),
+                                  SOUR=3.969045852220354E8,),
+                               _F(GROUP_MA=('_57', ),
+                                  SOUR=4.0315253359325826E8,),
+                               _F(GROUP_MA=('_58', ),
+                                  SOUR=4.094380426048392E8,),
+                               _F(GROUP_MA=('_59', ),
+                                  SOUR=4.1565429333557093E8,),
+                               _F(GROUP_MA=('_60', ),
+                                  SOUR=4.2224978316784793E8,),
+                               _F(GROUP_MA=('_61', ),
+                                  SOUR=4.2932464041187054E8,),
+                               _F(GROUP_MA=('_62', ),
+                                  SOUR=4.371866020583478E8,),
+                               _F(GROUP_MA=('_63', ),
+                                  SOUR=4.459586132652243E8,),
+                               _F(GROUP_MA=('_64', ),
+                                  SOUR=4.554473188949035E8,),
+                               _F(GROUP_MA=('_65', ),
+                                  SOUR=4.655340336467601E8,),
+                               _F(GROUP_MA=('_66', ),
+                                  SOUR=4.751761021308587E8,),
+                               _F(GROUP_MA=('_67', ),
+                                  SOUR=4.8390986589293426E8,),
+                               _F(GROUP_MA=('_68', ),
+                                  SOUR=4.923176605919556E8,),
+                               _F(GROUP_MA=('_69', ),
+                                  SOUR=5.0094461283677185E8,),
+                               _F(GROUP_MA=('_70', ),
+                                  SOUR=5.1022549234888095E8,),
+                               _F(GROUP_MA=('_71', ),
+                                  SOUR=5.203537797064285E8,),
+                               _F(GROUP_MA=('_72', ),
+                                  SOUR=5.3052319279155105E8,),
+                               _F(GROUP_MA=('_73', ),
+                                  SOUR=5.404833566285343E8,),
+                               _F(GROUP_MA=('_74', ),
+                                  SOUR=5.505447315583503E8,),
+                               _F(GROUP_MA=('_75', ),
+                                  SOUR=5.605065065105293E8,),
+                               _F(GROUP_MA=('_76', ),
+                                  SOUR=5.69960532281246E8,),
+                               _F(GROUP_MA=('_77', ),
+                                  SOUR=5.788795421342759E8,),
+                               _F(GROUP_MA=('_78', ),
+                                  SOUR=5.873227856071463E8,),
+                               _F(GROUP_MA=('_79', ),
+                                  SOUR=5.943928794584818E8,),
+                               _F(GROUP_MA=('_80', ),
+                                  SOUR=6.022952683133348E8,),
+                               _F(GROUP_MA=('_81', ),
+                                  SOUR=6.106695679041281E8,),
+                               _F(GROUP_MA=('_82', ),
+                                  SOUR=6.20505236821835E8,),
+                               _F(GROUP_MA=('_83', ),
+                                  SOUR=6.314201582352289E8,),
+                               _F(GROUP_MA=('_84', ),
+                                  SOUR=6.430504494540867E8,),
+                               _F(GROUP_MA=('_85', ),
+                                  SOUR=6.548538722228248E8,),
+                               _F(GROUP_MA=('_86', ),
+                                  SOUR=6.676981522199647E8,),
+                               _F(GROUP_MA=('_87', ),
+                                  SOUR=6.79778547506716E8,),
+                               _F(GROUP_MA=('_88', ),
+                                  SOUR=6.914798643117132E8,),
+                               _F(GROUP_MA=('_89', ),
+                                  SOUR=7.040300380480834E8,),
+                               _F(GROUP_MA=('_90', ),
+                                  SOUR=7.192454210308808E8,),
+                               _F(GROUP_MA=('_91', ),
+                                  SOUR=7.356602158313843E8,),
+                               _F(GROUP_MA=('_92', ),
+                                  SOUR=7.520074230861295E8,),
+                               _F(GROUP_MA=('_93', ),
+                                  SOUR=7.682132376006895E8,),
+                               _F(GROUP_MA=('_94', ),
+                                  SOUR=7.837686396359963E8,),
+                               _F(GROUP_MA=('_95', ),
+                                  SOUR=7.979117610555311E8,),
+                               _F(GROUP_MA=('_96', ),
+                                  SOUR=8.120107108324338E8,),
+                               _F(GROUP_MA=('_97', ),
+                                  SOUR=8.282150698530294E8,),
+                               _F(GROUP_MA=('_98', ),
+                                  SOUR=8.464278022481838E8,),
+                               _F(GROUP_MA=('_99', ),
+                                  SOUR=8.671858588200052E8,),
+                               ),
+                       DOUBLE_LAGRANGE='OUI',
+                       INFO=1,)
+
+  # Memory (Mo):    387.28 /    382.41 /     65.25 /     52.73 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0015 user+syst:          0.22S (syst:          0.03S, Elaps:          0.21S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt87
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0016 Concept of the type:  fonction_sdaster
+  # ------------------------------------------------------------------------------------------
+  PipeFlux = DEFI_FONCTION(NOM_PARA='TEMP',
+                           VALE=(10.0, 6.330702856224E5, 11.0, 6.047076670272E5, 12.0, 5.7596877061532E5, 13.0, 5.4685926771588E5, 14.0, 5.1738463827178E5, 15.0, 4.8755018095844E5, 16.0, 4.573610227186E5, 17.0, 4.2682212775055E5, 18.0, 3.9593830598402E5, 19.0, 3.6471422107586E5, 20.0, 3.3315439795494E5, 21.0, 3.0126322994407E5, 22.0, 2.6904498548417E5, 23.0, 2.3650381448475E5, 24.0, 2.0364375432293E5, 25.0, 1.7046873551138E5, 26.0, 1.3698258705487E5, 27.0, 1.0318904151315E5, 28.0, 6.909173978727E4, 29.0, 3.469423564496E4, 30.0, 0.0, 31.0, -3.498757504071E4, 32.0, -7.02651723492E4, 33.0, -1.0582954615552E5, 34.0, -1.4167751862235E5, 35.0, -1.7780597660431E5, 36.0, -2.1421186858185E5, 37.0, -2.508922017602E5, 38.0, -2.8784403932435E5, 39.0, -3.2506449784153E5, 40.0, -3.6255074480335E5, 41.0, -4.0029999629987E5, 42.0, -4.383095148187E5, 43.0, -4.765766071622E5, 44.0, -5.150986224766E5, 45.0, -5.5387295038708E5, 46.0, -5.9289701923298E5, 47.0, -6.3216829439787E5, 48.0, -6.7168427672967E5, 49.0, -7.1144250104554E5, 50.0, -7.5144053471757E5, 51.0, -7.9167597633454E5, 52.0, -8.3214645443603E5, 53.0, -8.7284962631496E5, 54.0, -9.137831768847E5, 55.0, -9.5494481760779E5, 56.0, -9.9633228548258E5, 57.0, -1.037943342085E6, 58.0, -1.0797757726624E6, 59.0, -1.12182738527685E6, 60.0, -1.16409600999493E6, 61.0, -1.2065794981223E6, 62.0, -1.24927572147965E6, 63.0, -1.29218257171879E6, 64.0, -1.33529795967619E6, 65.0, -1.37861981476217E6, 66.0, -1.42214608438395E6, 67.0, -1.46587473340042E6, 68.0, -1.50980374360754E6, 69.0, -1.55393111325198E6, 70.0, -1.59825485657235E6, 71.0, -1.64277300336583E6, 72.0, -1.68748359857916E6, 73.0, -1.732384701923E6, 74.0, -1.77747438750747E6, 75.0, -1.82275074349929E6, 76.0, -1.86821187179747E6, 77.0, -1.91385588772832E6, 78.0, -1.95968091975748E6, 79.0, -2.00568510921891E6, 80.0, -2.05186661005928E6, 81.0, -2.09822358859752E6, 82.0, -2.14475422329818E6, 83.0, -2.19145670455822E6, 84.0, -2.23832923450662E6, 85.0, -2.28537002681528E6, 86.0, -2.33257730652212E6, 87.0, -2.37994930986401E6, 88.0, -2.42748428412023E6, 89.0, -2.47518048746546E6, 90.0, -2.52303618883168E6, 91.0, -2.57104966777869E6, 92.0, -2.61921921437267E6, 93.0, -2.66754312907242E6, 94.0, -2.71601972262279E6, 95.0, -2.76464731595489E6, 96.0, -2.8134242400929E6, 97.0, -2.86234883606679E6, 98.0, -2.91141945483101E6, 99.0, -2.96063445718838E6, 100.0, -3.0099922137194E6, 101.0, -3.05949110471607E6, 102.0, -3.10912952012077E6, 103.0, -3.15890585946906E6, 104.0, -3.20881853183662E6, 105.0, -3.25886595579047E6, 106.0, -3.30904655934326E6, 107.0, -3.35935877991134E6, 108.0, -3.40980106427625E6, 109.0, -3.46037186854862E6, 110.0, -3.51106965813591E6, 111.0, -3.56189290771192E6, 112.0, -3.6128401011897E6, 113.0, -3.6639097316964E6, 114.0, -3.71510030155035E6, 115.0, -3.76641032224099E6, 116.0, -3.81783831440998E6, 117.0, -3.86938280783477E6, 118.0, -3.92104234141396E6, 119.0, -3.97281546315403E6, 120.0, -4.02470073015847E6, 121.0, -4.07669670861736E6, 122.0, -4.12880197379933E6, 123.0, -4.1810151100444E6, 124.0, -4.23333471075852E6, 125.0, -4.28575937840873E6, 126.0, -4.33828772452025E6, 127.0, -4.39091836967389E6, 128.0, -4.44364994350529E6, 129.0, -4.49648108470446E6, 130.0, -4.54941044101672E6, 131.0, -4.60243666924456E6, 132.0, -4.65555843524988E6, 133.0, -4.70877441395771E6, 134.0, -4.76208328936032E6, 135.0, -4.81548375452201E6, 136.0, -4.86897451158509E6, 137.0, -4.92255427177607E6, 138.0, -4.9762217554129E6, 139.0, -5.02997569191249E6, 140.0, -5.0838148197995E6, 141.0, -5.13773788671491E6, 142.0, -5.1917436494261E6, 143.0, -5.24583087383693E6, 144.0, -5.29999833499829E6, 145.0, -5.35424481712023E6, 146.0, -5.40856911358356E6, 147.0, -5.46297002695235E6, 148.0, -5.51744636898766E6, 149.0, -5.57199696066097E6, 150.0, -5.62662063216883E6, 151.0, -5.68131622294766E6, 152.0, -5.73608258168952E6, 153.0, -5.79091856635849E6, 154.0, -5.84582304420733E6, 155.0, -5.90079489179521E6, 156.0, -5.95583299500591E6, 157.0, -6.01093624906647E6, 158.0, -6.0661035585672E6, 159.0, -6.12133383748164E6, 160.0, -6.17662600918794E6, 161.0, -6.23197900649036E6, 162.0, -6.28739177164226E6, 163.0, -6.34286325636933E6, 164.0, -6.39839242189403E6, 165.0, -6.4539782389609E6, 166.0, -6.50961968786258E6, 167.0, -6.56531575846693E6, 168.0, -6.62106545024543E6, 169.0, -6.67686777230204E6, 170.0, -6.73272174340374E6, 171.0, -6.78862639201195E6, 172.0, -6.84458075631479E6, 173.0, -6.90058388426156E6, 174.0, -6.95663483359746E6, 175.0, -7.01273267190001E6, 176.0, -7.0688764766177E6, 177.0, -7.12506533510856E6, 178.0, -7.1813136932081E6, 179.0, -7.23765170863982E6, 180.0, -7.29406318487334E6, 181.0, -7.35054748434127E6, 182.0, -7.40710396920206E6, 183.0, -7.4637320013378E6, 184.0, -7.52043094235275E6, 185.0, -7.57720015357079E6, 186.0, -7.63403899603338E6, 187.0, -7.69094683049721E6, 188.0, -7.74792301743178E6, 189.0, -7.80496691701672E6, 190.0, -7.86207788913896E6, 191.0, -7.91925529339005E6, 191.61, -7.95400721311843E6, 192.61, -8.0113771176199E6, 193.61, -8.06904481980388E6, 194.61, -8.12711539016107E6, 195.61, -8.18571963522539E6, 196.61, -8.24501742439707E6, 197.61, -8.30520112271028E6, 198.61, -8.36649909809766E6, 199.61, -8.42917926480274E6, 200.61, -8.493552616383E6, 201.61, -8.55997669227709E6, 202.61, -8.62885891134316E6, 203.61, -8.70065969441316E6, 204.61, -8.77589528623795E6, 205.61, -8.85514017591183E6, 206.61, -8.93902900489985E6, 207.61, -9.02825784430192E6, 208.61, -9.12358471935888E6, 209.61, -9.22582926094151E6, 210.61, -9.33587137240314E6, 211.61, -9.4546488170941E6, 212.61, -9.58315365803075E6, 213.61, -9.72242751703347E6, 214.61, -9.87355566556543E6, 215.61, -1.003766001185824E7, 216.61, -1.021589110586932E7, 217.61, -1.040941934119094E7, 218.61, -1.061942558639867E7, 219.61, -1.084709152228098E7, 220.61, -1.109358999102309E7, 221.61, -1.136007567480841E7, 222.61, -1.164767641221919E7, 223.61, -1.195748543114128E7, 224.61, -1.229055472877859E7, 225.61, -1.264788976706233E7, 226.61, -1.303044558090328E7, 227.61, -1.343912432376983E7, 228.61, -1.387477420619131E7, 229.61, -1.433818972323374E7, 230.61, -1.483011302049903E7, 231.61, -1.535123621670728E7, 232.61, -1.590220448462299E7, 233.61, -1.648361968971512E7, 234.61, -1.709604439516938E7, 235.61, -1.774000605981836E7, 236.61, -1.841600127919063E7, 237.61, -1.912449994640328E7, 238.61, -1.986594923666012E7, 239.61, -2.064077734486227E7, 240.35, -2.123690476733719E7),
+                           PROL_DROITE='LINEAIRE',
+                           PROL_GAUCHE='LINEAIRE',
+                           NOM_RESU='TOUTRESU',
+                           INTERPOL=('LIN', ),
+                           VERIF='CROISSANT',
+                           INFO=1,)
+
+  # Memory (Mo):    387.28 /    382.41 /     65.25 /     52.73 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0016 user+syst:          0.01S (syst:          0.00S, Elaps:          0.01S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt90
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0017 Concept of the type:  char_ther
+  # ------------------------------------------------------------------------------------------
+  PipeHTC = AFFE_CHAR_THER_F(MODELE=Thermod,
+                             FLUX_NL=_F(GROUP_MA=('PipeFace', ),
+                                        FLUN=PipeFlux,),
+                             DOUBLE_LAGRANGE='OUI',
+                             INFO=1,)
+
+  # Memory (Mo):    387.28 /    382.41 /     65.27 /     52.73 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0017 user+syst:          0.03S (syst:          0.01S, Elaps:          0.02S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt105
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0018 Concept of the type:  char_ther
+  # ------------------------------------------------------------------------------------------
+  Con_TB = AFFE_CHAR_THER(MODELE=Thermod,
+                          LIAISON_MAIL=_F(GROUP_MA_MAIT=('Tile', ),
+                                          GROUP_MA_ESCL=('ContactTB', ),
+                                          ELIM_MULT='NON',),
+                          DOUBLE_LAGRANGE='OUI',
+                          INFO=1,)
+
+  # Memory (Mo):    397.08 /    382.86 /     76.54 /     52.73 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0018 user+syst:          0.06S (syst:          0.01S, Elaps:          0.06S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt116
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0019 Concept of the type:  char_ther
+  # ------------------------------------------------------------------------------------------
+  Con_BP = AFFE_CHAR_THER(MODELE=Thermod,
+                          LIAISON_MAIL=_F(GROUP_MA_MAIT=('Block', ),
+                                          GROUP_MA_ESCL=('ContactBP', ),
+                                          ELIM_MULT='NON',),
+                          DOUBLE_LAGRANGE='OUI',
+                          INFO=1,)
+
+  # Memory (Mo):    397.08 /    383.35 /     76.54 /     52.73 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0019 user+syst:          0.04S (syst:          0.01S, Elaps:          0.04S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt160
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0020 Concept of the type:  evol_ther
+  # ------------------------------------------------------------------------------------------
+  resther = THER_NON_LINE(MODELE=Thermod,
+                          CHAM_MATER=Thermat,
+                          EXCIT=(_F(CHARGE=EMI,),
+                                 _F(CHARGE=PipeHTC,),
+                                 _F(CHARGE=Con_TB,),
+                                 _F(CHARGE=Con_BP,),
+                                 ),
+                          ETAT_INIT=_F(STATIONNAIRE='OUI',
+                                       VALE=30,
+                                       PRECISION=1.E-06,
+                                       CRITERE='RELATIF',),
+                          CONVERGENCE=_F(ITER_GLOB_MAXI=30,),
+                          SOLVEUR=_F(METHODE='MUMPS',
+                                     RENUM='AUTO',
+                                     NPREC=8,
+                                     ELIM_LAGR='LAGR2',
+                                     STOP_SINGULIER='OUI',
+                                     TYPE_RESOL='AUTO',
+                                     ACCELERATION='AUTO',
+                                     LOW_RANK_SEUIL=0.0,
+                                     PRETRAITEMENTS='AUTO',
+                                     POSTTRAITEMENTS='AUTO',
+                                     PCENT_PIVOT=20,
+                                     RESI_RELA=-1.0,
+                                     GESTION_MEMOIRE='AUTO',
+                                     FILTRAGE_MATRICE=-1.0,
+                                     MIXER_PRECISION='NON',
+                                     MATR_DISTRIBUEE='NON',),
+                          NEWTON=_F(REAC_ITER=3,
+                                    RESI_LINE_RELA=1.E-3,
+                                    ITER_LINE_MAXI=0,),
+                          COMPORTEMENT=_F(RELATION='THER_NL',),
+                          METHODE='NEWTON',
+                          PARM_THETA=0.57,
+                          ARCHIVAGE=_F(PRECISION=1.E-06,
+                                       CRITERE='RELATIF',),
+                          )
+
+  Le système linéaire à résoudre a 31529 degrés de liberté:
+   - 29133 sont des degrés de liberté physiques
+     (ils sont portés par 29133 noeuds du maillage)
+   - 2396 sont les couples de paramètres de Lagrange associés
+     aux 1198 relations linéaires dualisées.
+  La matrice est de taille 31529 équations.
+  Elle contient 211268 termes non nuls si elle est symétrique et 391007 termes non nuls si elle n'est pas symétrique.
+  Soit un taux de remplissage de   0.039 %.
+  The field of initial temperature is given by a value which is worth   3.000000000000e+01
+-------------------------------------------------------------------------------------------------------
+
+ Time of computation:   0.000000000000e+00 
+-------------------------------------------------------------------------------------------------------
+|     NEWTON     |     RESIDU     |     RESIDU     |  RECH.  LINE.  |  RECH.  LINE.  |     OPTION     |
+|    ITERATION   |     RELATIF    |     ABSOLU     |    NB. ITER    |  COEFFICIENT   |   ASSEMBLAGE   |
+|                | RESI_GLOB_RELA | RESI_GLOB_MAXI |                |      RHO       |                |
+-------------------------------------------------------------------------------------------------------
+|     1          | 1.00708E+00  X | 6.00000E+01    |                |                |                |
+|     2          | 8.79887E-03  X | 1.28025E-02    |                |                |                |
+|     3          | 3.88352E-04  X | 6.07973E-04    |                |                |      OUI       |
+|     4          | 4.71643E-08    | 4.29868E-07    |                |                |                |
+-------------------------------------------------------------------------------------------------------
+
+ Filing of the fields 
+    Field stored  TEMP at time  0.000000000000e+00 for the sequence number  0
+    Field stored  COMPORTHER at time  0.000000000000e+00 for the sequence number  0
+
+ Time CPU spent in this time step:  5.059 s 
+
+
+#1      Resolution des systemes lineaires                 CPU (USER+SYST/SYST/ELAPS):      2.15      0.76      2.16
+#2      Calculs elementaires et assemblages               CPU (USER+SYST/SYST/ELAPS):      2.95      0.11      2.96
+  # Memory (Mo):    572.07 /    393.85 /    122.57 /     65.06 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0020 user+syst:          5.34S (syst:          0.96S, Elaps:          5.34S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt166
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0021 Concept of the type:  -
+  # ------------------------------------------------------------------------------------------
+  DEFI_FICHIER(UNITE=80,
+               FICHIER='./REPE_OUT/Thermal.rmed',
+               TYPE='BINARY',
+               ACCES='NEW',
+               ACTION='ASSOCIER',)
+
+
+
+Lancement de la commande : rm -f ./REPE_OUT/Thermal.rmed
+
+  # Memory (Mo):    572.07 /    393.85 /    122.57 /     65.06 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0021 user+syst:          0.06S (syst:          0.04S, Elaps:          0.05S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt171
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0022 Concept of the type:  -
+  # ------------------------------------------------------------------------------------------
+  IMPR_RESU(UNITE=80,
+            VERSION_MED='3.3.1',
+            RESU=_F(RESULTAT=resther,
+                    NOM_CHAM=('TEMP', ),
+                    NOM_CHAM_MED=('Temperature', ),
+                    INFO_MAILLAGE='NON',
+                    IMPR_NOM_VARI='OUI',),
+            FORMAT='MED',
+            PROC0='OUI',
+            INFO=1,)
+
+
+Création du fichier au format MED 3.3.1.
+  # Memory (Mo):    572.07 /    393.85 /    122.57 /     65.06 (VmPeak / VmSize / Optimum / Minimum)
+  # Fin orders No:  0022 user+syst:          0.14S (syst:          0.04S, Elaps:          0.23S)
+  # ------------------------------------------------------------------------------------------
+
+.. __stg1_txt173
+  # ------------------------------------------------------------------------------------------
+  # Commands No:  0023 Concept of the type:  -
+  # ------------------------------------------------------------------------------------------
+  FIN(FORMAT_HDF='NON',
+      RETASSAGE='NON',
+      INFO_RESU='OUI',
+      PROC0='OUI',
+      )
+
+   
+   !-----------------------------------------------------------------!
+   ! <I> <CATAMESS_89>                                               !
+   !                                                                 !
+   !  List of warnings emitted during the execution of computation.  !
+   !                                                                 !
+   !  Warnings which you chose to ignore of are preceded by (*).     !
+   !  Number of occurrences for each warning:                        !
+   !              SUPERVIS2_2          emitted    1 time             !
+   !              SUPERVIS_1           emitted    1 time             !
+   !-----------------------------------------------------------------!
+   
+
+ ======>
+
+ STRUCTURE DU CONCEPT resther  CALCULE POUR 1 NUMERO D'ORDRE
+
+ LISTE DES NOMS SYMBOLIQUES:
+ ! ---------- !----------------!----------------!
+ ! NUME_ORDRE !      TEMP      !   COMPORTHER   !
+ ! ---------- !----------------!----------------!
+ !          0 !     TEMP_R     !     COMPOR     !
+ ! ---------- !----------------!----------------!
+
+ LISTE DES NOMS DE VARIABLES D'ACCES:
+                                      INST             DE TYPE  R
+
+ LISTE DES NOMS DE PARAMETRES:
+ ! ---------- !----------------!----------------!----------------!----------------!----------------!----------------!----------------!
+ ! NUME_ORDRE !     MODELE     !    CHAMPMAT    !    CARAELEM    !     EXCIT      !   ITER_GLOB    !   PARM_THETA   !     DELTAT     !
+ ! ---------- !----------------!----------------!----------------!----------------!----------------!----------------!----------------!
+ !          0 !       K8       !       K8       !       K8       !      K24       !       I        !       R        !       R        !
+ ! ---------- !----------------!----------------!----------------!----------------!----------------!----------------!----------------!
+ ---------------------------------------------------------------------------
+ Concepts de la base: G
+    Nom       Type                 Taille (Mo)         Nombre      Nombre de
+                                                     d'objets       segments
+    TOTAL                                55.39            226            513
+  
+    mesh       MAILLAGE_SDASTER          17.17             36            188
+    Thermod    MODELE_SDASTER             5.08              8             13
+    BlockRCP   FONCTION_SDASTER           0.00              4              4
+    BlockLAM   FONCTION_SDASTER           0.00              4              4
+    BlockMat   MATER_SDASTER              0.00              5              5
+    PipeRCP    FONCTION_SDASTER           0.00              4              4
+    PipeLAM    FONCTION_SDASTER           0.00              4              4
+    PipeMat    MATER_SDASTER              0.00              5              5
+    TileRCP    FONCTION_SDASTER           0.00              4              4
+    TileLAM    FONCTION_SDASTER           0.00              4              4
+    TileMat    MATER_SDASTER              0.00              5              5
+    Thermat    CHAM_MATER                 1.74              6             11
+    EMI        CHAR_THER                  1.09              8             13
+    PipeFlux   FONCTION_SDASTER           0.00              4              4
+    PipeHTC    CHAR_THER                  0.01              8             13
+    Con_TB     CHAR_THER                  0.41             20             40
+    Con_BP     CHAR_THER                  0.77             20             40
+    resther    EVOL_THER                  1.83             26             40
+    &FOZERO                               0.00              2              2
+    &&_NUM_C                              0.00              1              1
+    &CATA.AC                              0.00              2              4
+    &CATA.CL                              0.60              1              3
+    &CATA.GD                              0.14              4             11
+    &CATA.ME                              0.20              2              4
+    &CATA.OP                              0.30              4             19
+    &CATA.PH                              0.00              1              1
+    &CATA.PR                              0.00              2              4
+    &CATA.TE                             26.03             17             42
+    &CATA.TH                              0.01              2              4
+    &CATA.TM                              0.01              7             11
+    _0000001                              0.00              2              2
+    _0000002                              0.00              2              2
+    _0000003                              0.00              2              2
+ ---------------------------------------------------------------------------
+
+
+     Nom de la base                          :  GLOBALE
+     Nombre d'enregistrements utilisés       :  90
+     Nombre d'enregistrements maximum        :  62914
+     Longueur d'enregistrement (octets)      :  819200
+     Nombre total d'accès en lecture         :  7
+     Volume des accès en lecture             :          5.47 Mo.
+     Nombre total d'accès en écriture        :  106
+     Volume des accès en écriture            :         82.81 Mo.
+     Nombre d'identificateurs utilisés       :  400
+     Taille maximum du répertoire            :  2000
+     Pourcentage d'utilisation du répertoire :  20 %
+
+
+     Nom de la base                          :  VOLATILE
+     Nombre d'enregistrements utilisés       :  9
+     Nombre d'enregistrements maximum        :  62914
+     Longueur d'enregistrement (octets)      :  819200
+     Nombre total d'accès en lecture         :  3
+     Volume des accès en lecture             :          2.34 Mo.
+     Nombre total d'accès en écriture        :  16
+     Volume des accès en écriture            :         12.50 Mo.
+     Nombre d'identificateurs utilisés       :  745
+     Taille maximum du répertoire            :  2000
+     Pourcentage d'utilisation du répertoire :  37 %
+
+ <FIN> Arrêt normal dans "FIN".
+ <I> <FIN> ARRET NORMAL DANS "FIN" PAR APPEL A "JEFINI".
+
+ The memory requested from launching is over-estimated, it is of 2048.00 Mo. 
+ The peak report used is of 572.07 Mo. 
+ 
+
+
+     Nom de la base                          :  ELEMBASE
+     Nombre d'enregistrements utilisés       :  43
+     Nombre d'enregistrements maximum        :  512
+     Longueur d'enregistrement (octets)      :  819200
+     Nombre total d'accès en lecture         :  60
+     Volume des accès en lecture             :         46.88 Mo.
+     Nombre total d'accès en écriture        :  0
+     Volume des accès en écriture            :          0.00 Mo.
+     Nombre d'identificateurs utilisés       :  123
+     Taille maximum du répertoire            :  300
+     Pourcentage d'utilisation du répertoire :  41 %
+  
+ <I> <FIN> MEMOIRE JEVEUX MINIMALE REQUISE POUR L'EXECUTION :                      65.06 Mo
+ <I> <FIN> MEMOIRE JEVEUX OPTIMALE REQUISE POUR L'EXECUTION :                     122.57 Mo
+ <I> <FIN> MAXIMUM DE MEMOIRE UTILISEE PAR LE PROCESSUS LORS DE L'EXECUTION :     572.07 Mo
+  
+ <I>       FERMETURE DES BASES EFFECTUEE
+  
+   STATISTIQUES CONCERNANT L'ALLOCATION DYNAMIQUE :
+     TAILLE CUMULEE MAXIMUM            :                  123  Mo.
+     TAILLE CUMULEE LIBEREE            :                   82  Mo.
+     NOMBRE TOTAL D'ALLOCATIONS        :                79284
+     NOMBRE TOTAL DE LIBERATIONS       :                79264
+     APPELS AU MECANISME DE LIBERATION :                    0
+     TAILLE MEMOIRE CUMULEE RECUPEREE  :                    2  Mo.
+     VOLUME DES LECTURES               :                    0  Mo.
+     VOLUME DES ECRITURES              :                    8  Mo.
+  
+   MEMOIRE JEVEUX MINIMALE REQUISE POUR L'EXECUTION :      65.06 Mo
+     - IMPOSE DE NOMBREUX ACCES DISQUE
+     - RALENTIT LA VITESSE D'EXECUTION
+   MEMOIRE JEVEUX OPTIMALE REQUISE POUR L'EXECUTION :     122.57 Mo
+     - LIMITE LES ACCES DISQUE
+     - AMELIORE LA VITESSE D'EXECUTION
+   MAXIMUM DE MEMOIRE UTILISEE PAR LE PROCESSUS     :     572.07 Mo
+     - COMPREND LA MEMOIRE CONSOMMEE PAR  JEVEUX, 
+       LE SUPERVISEUR PYTHON, LES LIBRAIRIES EXTERNES
+  
+ <I>       FIN D'EXECUTION LE : MA-28-FEVR-2023 14:52:05
+
+
+  <I> Informations sur les temps d'exécution
+      Temps cpu user total                    5.84 s
+      Temps cpu systeme total                 1.81 s
+      Temps elapsed total                     7.75 s
+      Temps restant                       99091.25 s
+
+
+ The signup of the saved base is (with the address 0): 
+  bac91e45ddafbc6d1a45af559234e20872d8ed39 
+
+ ********************************************************************************
+ * COMMAND                  :       USER :     SYSTEM :   USER+SYS :    ELAPSED *
+ ********************************************************************************
+ * init (jdc)               :       5.86 :       1.81 :       7.67 :       7.77 *
+ *  . compile               :       0.00 :       0.00 :       0.00 :       0.00 *
+ *  . exec_compile          :       5.59 :       1.61 :       7.20 :       7.30 *
+ * DEBUT                    :       0.01 :       0.17 :       0.18 :       0.19 *
+ * LIRE_MAILLAGE            :       0.40 :       0.04 :       0.44 :       0.44 *
+ * AFFE_MODELE              :       0.14 :       0.01 :       0.15 :       0.15 *
+ * DEFI_FONCTION            :       0.00 :       0.00 :       0.00 :       0.00 *
+ * DEFI_FONCTION            :       0.00 :       0.00 :       0.00 :       0.00 *
+ * DEFI_MATERIAU            :       0.00 :       0.00 :       0.00 :       0.01 *
+ * DEFI_FONCTION            :       0.00 :       0.00 :       0.00 :       0.00 *
+ * DEFI_FONCTION            :       0.00 :       0.00 :       0.00 :       0.00 *
+ * DEFI_MATERIAU            :       0.00 :       0.00 :       0.00 :       0.01 *
+ * DEFI_FONCTION            :       0.00 :       0.00 :       0.00 :       0.00 *
+ * DEFI_FONCTION            :       0.00 :       0.00 :       0.00 :       0.00 *
+ * DEFI_MATERIAU            :       0.01 :       0.00 :       0.01 :       0.00 *
+ * AFFE_MATERIAU            :       0.01 :       0.01 :       0.02 :       0.02 *
+ * AFFE_CHAR_THER           :       0.19 :       0.03 :       0.22 :       0.21 *
+ * DEFI_FONCTION            :       0.01 :       0.00 :       0.01 :       0.01 *
+ * AFFE_CHAR_THER_F         :       0.02 :       0.01 :       0.03 :       0.02 *
+ * AFFE_CHAR_THER           :       0.05 :       0.01 :       0.06 :       0.06 *
+ * AFFE_CHAR_THER           :       0.03 :       0.01 :       0.04 :       0.04 *
+ * THER_NON_LINE            :       4.38 :       0.96 :       5.34 :       5.34 *
+ * DEFI_FICHIER             :       0.02 :       0.04 :       0.06 :       0.05 *
+ * IMPR_RESU                :       0.10 :       0.04 :       0.14 :       0.23 *
+ * FIN                      :       0.05 :       0.08 :       0.13 :       0.12 *
+ *  . part Superviseur      :       0.48 :       0.61 :       1.09 :       1.12 *
+ *  . part Fortran          :       5.38 :       1.20 :       6.58 :       6.65 *
+ ********************************************************************************
+ * TOTAL_JOB                :       5.84 :       1.81 :       7.65 :       7.75 *
+ ********************************************************************************
+
+--- End of the execution
+EXECUTION_CODE_ASTER_EXIT_3639=0

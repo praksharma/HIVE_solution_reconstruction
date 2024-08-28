@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<ExternalLoadData CurrentVersion="2" ImportType="By Reference">
+  <FilesData Count="1">
+    <FileData CurrentVersion="4" Description="" Master="True" PathType="FullPath" Location="C:\Users\Prakh\Desktop\HIVE\ANSYS\Loads\HeatTransfer.csv">
+      <FileDataProperty CurrentVersion="4" FileIdentifier="File1" Dimensions="3D" StartImportAtLine="1" FormatType="Delimited" FormatString="" DelimiterType="Comma" DelimiterCharacter="," SectionName="" LengthUnit="m" CoordinateSystemType="Cartesian" OriginX="0" OriginXUnit="m" OriginY="0" OriginYUnit="m" OriginZ="0" OriginZUnit="m" ThetaXY="0" ThetaXYUnit="radian" ThetaYZ="0" ThetaYZUnit="radian" ThetaZX="0" ThetaZXUnit="radian" MorphX="x" MorphY="y" MorphZ="z" ConversionOption="NoConversion" MaterialFieldData="False" DummyNetData="False">
+        <ColumnsData Count="2">
+          <ColumnData CurrentVersion="2" DataType="Temperature" Unit="C" Identifier="Temperature1" QuantityType="Temperature" />
+          <ColumnData CurrentVersion="2" DataType="Heat Flux" Unit="W m^-2" Identifier="HeatFlux1" QuantityType="Heat Flux" />
+        </ColumnsData>
+        <SupportFiles Count="0" />
+      </FileDataProperty>
+    </FileData>
+  </FilesData>
+</ExternalLoadData>
