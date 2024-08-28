@@ -1,0 +1,3 @@
+[NbConvertApp] Converting notebook forward.ipynb to notebook
+[NbConvertApp] Writing 1726249 bytes to forward.ipynb
+slurmstepd: error: unlink(/tmp/slurmd/job7795772/slurm_script): No such file or directory
